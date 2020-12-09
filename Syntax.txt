@@ -1,0 +1,51 @@
+    Start            ::= FuncDecl+
+
+// Identifier
+
+    Identifier       ::= Identifier[Character {Character | Number}*]
+    Number           ::= Number[Digit+]
+    Digit            ::= "regexp:[0-9]"
+    Character        ::= EngCharacter | '_'
+    EngCharacter     ::= "regexp:[a-zA-Z]"
+
+// Function essentials
+
+    FuncDecl         ::= FDecl['never gonna'] Identifier LPA['(']
+                         ArgumentsList? RPA[')'] BlockStmt
+    ArgumentsList    ::= Identifier {Comma[','] Identifier}*
+    CallList         ::= rValue {Comma[','] rValue}*
+
+// Values
+
+    rValue           ::= AddSubExpr {(Eq['=='] | Leq['<='] | Geq['>='] |
+                         Neq['!='] | Gr['>']| Le['<']) AddSubExpr}*
+    AddSubExpr       ::= MulDivExpr
+                         {(Plus['+'] | Minus['-']) MulDivExpr}*
+    MulDivExpr       ::= UnaryExpr {(Mul['*'] | Div['/']) UnaryExpr}*
+    UnaryExpr        ::= PrimaryExpr | UnaryOperator PrimaryExpr
+    UnaryOperator    ::= Plus['+'] | Minus['-']
+    PrimaryExpr      ::= LPA['('] rValue RPA[')'] | Number | FuncCall |
+                         Identifier
+    FuncCall         ::= Identifier LPA['('] CallList? RPA[')']
+
+// Blocks
+
+    BlockStmt        ::= BStart['strangers'] Statement* BEnd['to love']
+    Statement        ::=  (VarDef | Print | PrintLine | AssignExpr |
+                           FuncCall)  StEnd['bdum']
+                          | ReturnStmt | IfStmt | WhileStmt | BlockStmt
+
+    ReturnStmt       ::= Return['known each other for so long'] rValue  
+                         StEnd['bdum']
+    AssignExpr       ::= Identifier (Assg['='] | AdAssg['+='] |
+                         MiAssg['-='] | MuAssg['*='] | DiAssg['/=']) rValue
+    VarDef           ::= VDecl['make you'] (Identifier Assg['='] rValue |
+                                                            Identifier )
+    Print            ::= Print['goodbye']     rValue
+    PrintLine        ::= PrintL['desert you'] rValue
+    IfStmt           ::= If['you know the rules']
+                         LPA['('] rValue RPA[')']
+                         BlockStmt {Else['and so do I'] BlockStmt}?
+    WhileStmt        ::= While['run around']
+                         LPA['('] rValue RPA[')'] BlockStmt
+
