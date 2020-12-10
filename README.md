@@ -1,5 +1,5 @@
 # NGG
-Never gonna give you up programming language
+**Never Gonna Give** (you up) programming language
 
 Language with the power of the legend.
 
