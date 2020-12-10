@@ -20,8 +20,7 @@ if (expectLexAndMove(pos, lex) && storage == Lex_None) { \
 
 namespace NGG {
     class AST {
-        char* codeStart;
-        ASTNode *head;
+        ASTNode                *head;
         ClassicStack<ASTError> errorStack;
 
         void error(ParsePosition &pos, const char *msg) {
@@ -316,27 +315,33 @@ namespace NGG {
             if (!firstValue.hasValue())
                 return retValue;
 
-            LexemeType op = Lex_None;
+            ASTNode *lastNode = firstValue.unwrap();
 
-            LEX_SET_IF_NONE(op, Lex_Plus)
-            else LEX_SET_IF_NONE(op, Lex_Minus)
+            while (!pos.isEnded()) {
+                LexemeType op = Lex_None;
 
-            if (op != Lex_None) {
-                Optional<ASTNode *> secondValue = p_MulDivExpr(pos);
-                if (!secondValue.hasValue()) {
-                    error(pos, "No second operand found after +/- operator");
+                LEX_SET_IF_NONE(op, Lex_Plus)
+                else LEX_SET_IF_NONE(op, Lex_Minus)
+
+                if (op != Lex_None) {
+                    Optional<ASTNode *> secondValue = p_MulDivExpr(pos);
+                    if (!secondValue.hasValue()) {
+                        error(pos, "No operand found after +/- operator");
+                        return retValue;
+                    }
+                    auto *opNode = ASTNode::New();
+                    Lexeme opLex {};
+                    opLex.cTor(op);
+                    opNode->cTor(Kind_MaOperator, opLex, lastNode, secondValue.unwrap());
+                    lastNode = opNode;
+                } else {
+                    retValue.cTor(lastNode);
                     return retValue;
                 }
-                auto *opNode = ASTNode::New();
-                Lexeme opLex {};
-                opLex.cTor(op);
-                opNode->cTor(Kind_MaOperator, opLex, firstValue.unwrap(), secondValue.unwrap());
-                retValue.cTor(opNode);
-                return retValue;
-            } else {
-                retValue.cTor(firstValue.unwrap());
-                return retValue;
             }
+
+            retValue.cTor(lastNode);
+            return retValue;
         }
 
         Optional<ASTNode *> p_MulDivExpr(ParsePosition &pos) {
@@ -348,28 +353,33 @@ namespace NGG {
             if (!firstValue.hasValue())
                 return retValue;
 
-            LexemeType op = Lex_None;
+            ASTNode *lastNode = firstValue.unwrap();
 
-            LEX_SET_IF_NONE(op, Lex_Mul)
-            else LEX_SET_IF_NONE(op, Lex_Div)
+            while (!pos.isEnded()) {
+                LexemeType op = Lex_None;
 
-            if (op != Lex_None) {
-                Optional<ASTNode *> secondValue = p_UnaryExpr(pos);
-                if (!secondValue.hasValue()) {
-                    error(pos, "No second operand found after */ operator");
+                LEX_SET_IF_NONE(op, Lex_Mul)
+                else LEX_SET_IF_NONE(op, Lex_Div)
+
+                if (op != Lex_None) {
+                    Optional<ASTNode *> secondValue = p_UnaryExpr(pos);
+                    if (!secondValue.hasValue()) {
+                        error(pos, "No operand found after */ operator");
+                        return retValue;
+                    }
+                    auto *opNode = ASTNode::New();
+                    Lexeme opLex {};
+                    opLex.cTor(op);
+                    opNode->cTor(Kind_MaOperator, opLex, lastNode, secondValue.unwrap());
+                    lastNode = opNode;
+                } else {
+                    retValue.cTor(lastNode);
                     return retValue;
                 }
-
-                auto *opNode = ASTNode::New();
-                Lexeme opLex {};
-                opLex.cTor(op);
-                opNode->cTor(Kind_MaOperator, opLex, firstValue.unwrap(), secondValue.unwrap());
-                retValue.cTor(opNode);
-                return retValue;
-            } else {
-                retValue.cTor(firstValue.unwrap());
-                return retValue;
             }
+
+            retValue.cTor(lastNode);
+            return retValue;
         }
 
         Optional<ASTNode *> p_UnaryExpr(ParsePosition &pos) {
@@ -729,31 +739,21 @@ namespace NGG {
 
 
             if (node->getLeft()) {
+                if (node->getLeft()->getKind() == Kind_Linker && node->getKind() == node->getLeft()->getKind())
+                    fprintf(file, "{rank=same; node%p; node%p}\n", node, node->getLeft());
+
                 fprintf(file, "node%p->node%p\n", node, node->getLeft());
                 recursiveDump(file, node->getLeft());
             }
             if (node->getRight()) {
+                if (node->getRight()->getKind() == Kind_Linker && node->getKind() == node->getRight()->getKind())
+                    fprintf(file, "{rank=same; node%p; node%p}\n", node, node->getRight());
                 fprintf(file, "node%p->node%p\n", node, node->getRight());
                 recursiveDump(file, node->getRight());
             }
         }
-
-        static void getOffsets(const char* offset, const char* start, size_t& line, size_t& col) {
-            col = 0;
-            line = 0;
-            while (start <= offset){
-                if (*start == '\n'){
-                    line++;
-                    col = 0;
-                }
-                col++;
-                start++;
-            }
-        }
-
     public:
         void cTor() {
-            codeStart = nullptr;
             this->errorStack.cTor(0);
         }
 
@@ -776,10 +776,9 @@ namespace NGG {
             ParsePosition pos {};
             pos.cTor(&input);
 
-            if (!input.isEmpty()){
-                Lexeme tmp{}; tmp.cTor();
-                input.get(input.begin(), &tmp);
-                codeStart = tmp.getCodeOffset();
+            if (input.isEmpty()) {
+                head = getNoneNode();
+                return;
             }
 
             auto res = p_FuncDecl(pos);
@@ -787,7 +786,6 @@ namespace NGG {
                 res = p_VarDefStmt(pos);
                 if (!res.hasValue()) {
                     error(pos, "Undefined root sequence");
-                    head = nullptr;
                     return;
                 }
             }
@@ -834,10 +832,16 @@ namespace NGG {
 
             printf("\n");
             for (int i = 0; i < errorStack.getSize(); i++) {
-                size_t line=0, col=0;
-                getOffsets(storage[i].errorIt.getCodeOffset(), codeStart, line, col);
-                printf("%s at %s:%zu:%zu\n", storage[i].errorMsg, lexemeTypeToString(storage[i].errorIt.getType()), line + 1, col);
+                printf("%s at %s:%zu:%zu\n", storage[i].errorMsg, lexemeTypeToString(storage[i].errorIt.getType()), storage[i].errorIt.getLine() + 1, storage[i].errorIt.getCol() );
             }
+        }
+
+        ClassicStack<ASTError>& getErrorStack() {
+            return errorStack;
+        };
+
+        [[nodiscard]] bool hasError() const{
+            return !errorStack.isEmpty();
         }
     };
 }

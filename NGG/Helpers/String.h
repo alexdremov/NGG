@@ -80,6 +80,14 @@ public:
         storage[len] = '\0';
     }
 
+    void append(String* str) {
+        reallocate(str->len + 1);
+        strcpy(storage + len, str->storage);
+        len += str->len;
+        storage[len] = '\0';
+        updateLen();
+    }
+
     void sEndPrintf(size_t additionalSpace, const char * format, ...) {
         reallocate(additionalSpace);
         va_list args;

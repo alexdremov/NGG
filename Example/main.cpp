@@ -1,5 +1,6 @@
 #include "LexicalAnalysis/LexParser.h"
 #include "AST/AST.h"
+#include "Compiler/NGGCompiler.h"
 
 int main() {
     String content {};
@@ -8,8 +9,8 @@ int main() {
     content.readFromFile(sourceCode);
     fclose(sourceCode);
 
-    auto res = NGG::lexParse(&content);
-    NGG::dumpLexemes(res);
+    auto res = NGG::LexParser::parse(&content);
+    NGG::LexParser::dumpLexemes(res);
 
     auto ASTParser = NGG::AST {};
     ASTParser.cTor();

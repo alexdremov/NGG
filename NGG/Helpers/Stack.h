@@ -64,15 +64,15 @@ public:
         return &(this->data[size - 1]);
     }
 
-    Elem *getStorage() {
+    [[nodiscard]] Elem *getStorage() const {
         return data;
     }
 
-    size_t getSize() {
+    [[nodiscard]] size_t getSize() const {
         return size;
     }
 
-    bool isEmpty(){
+    [[nodiscard]] bool isEmpty() const{
         return size == 0;
     }
 };

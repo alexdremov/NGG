@@ -12,6 +12,8 @@ namespace NGG {
     class Lexeme {
         LexemeType type;
         bool       stringUsed;
+        size_t     col;
+        size_t     line;
         char*      codeOffset;
         union {
             String sContent;
@@ -20,7 +22,8 @@ namespace NGG {
     public:
         void cTor(){
             type = Lex_None;
-            codeOffset = nullptr;
+            col = 0;
+            line = 0;
             stringUsed = false;
         }
 
@@ -62,6 +65,18 @@ namespace NGG {
 
         [[nodiscard]] char* getCodeOffset() const{
             return codeOffset;
+        }
+
+        [[nodiscard]] size_t getLine() const{
+            return line;
+        }
+
+        [[nodiscard]] size_t getCol() const{
+            return col;
+        }
+        void setLineCol(size_t lexLine, size_t lexCol) {
+            line = lexLine;
+            col = lexCol;
         }
 
         [[nodiscard]] LexemeType getType() const{

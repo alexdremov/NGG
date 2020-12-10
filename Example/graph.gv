@@ -1,33 +1,21 @@
 digraph structure {
-node0x7fc493504840[label="Linker" shape=invhouse fillcolor=darkseagreen1 style=filled]
-node0x7fc493504840->node0x7fc493504800
-node0x7fc493504800[label="FuncDecl<Identifier<giveYouUp>>" shape=invhouse fillcolor=darkseagreen1 style=filled]
-node0x7fc493504800->node0x7fc493504140
-node0x7fc493504140[label="None<None>" shape=invhouse fillcolor=darkseagreen1 style=filled]
-node0x7fc493504800->node0x7fc493504540
-node0x7fc493504540[label="Linker" shape=invhouse fillcolor=darkseagreen1 style=filled]
-node0x7fc493504540->node0x7fc4935044c0
-node0x7fc4935044c0[label="VarDef<Identifier<coffee>>" shape=invhouse fillcolor=darkseagreen1 style=filled]
-node0x7fc4935044c0->node0x7fc493504500
-node0x7fc493504500[label="Number<123>" shape=oval fillcolor=pink style=filled]
-node0x7fc493504540->node0x7fc493504640
-node0x7fc493504640[label="Linker" shape=invhouse fillcolor=darkseagreen1 style=filled]
-node0x7fc493504640->node0x7fc4935045c0
-node0x7fc4935045c0[label="AssignExpr<AdAssg>" shape=invhouse fillcolor=darkseagreen1 style=filled]
-node0x7fc4935045c0->node0x7fc493504580
-node0x7fc493504580[label="Number<1>" shape=oval fillcolor=pink style=filled]
-node0x7fc4935045c0->node0x7fc493504600
-node0x7fc493504600[label="ID<coffee>" shape=oval fillcolor=aquamarine style=filled]
-node0x7fc493504640->node0x7fc493504700
-node0x7fc493504700[label="Linker" shape=invhouse fillcolor=darkseagreen1 style=filled]
-node0x7fc493504700->node0x7fc4935046c0
-node0x7fc4935046c0[label="Print<None>" shape=invhouse fillcolor=darkseagreen1 style=filled]
-node0x7fc4935046c0->node0x7fc493504680
-node0x7fc493504680[label="ID<coffee>" shape=oval fillcolor=aquamarine style=filled]
-node0x7fc493504700->node0x7fc4935047c0
-node0x7fc4935047c0[label="Linker" shape=invhouse fillcolor=darkseagreen1 style=filled]
-node0x7fc4935047c0->node0x7fc493504780
-node0x7fc493504780[label="ReturnStmt<None>" shape=invhouse fillcolor=darkseagreen1 style=filled]
-node0x7fc493504780->node0x7fc493504740
-node0x7fc493504740[label="ID<coffee>" shape=oval fillcolor=aquamarine style=filled]
+node0x7fe425c05e00[label="Linker" shape=invhouse fillcolor=darkseagreen1 style=filled]
+node0x7fe425c05e00->node0x7fe425c05db0
+node0x7fe425c05db0[label="Statement<None>" shape=invhouse fillcolor=darkseagreen1 style=filled]
+node0x7fe425c05db0->node0x7fe425c05b30
+node0x7fe425c05b30[label="VarDef<Identifier<y>>" shape=invhouse fillcolor=darkseagreen1 style=filled]
+node0x7fe425c05b30->node0x7fe425c05d60
+node0x7fe425c05d60[label="MaOperator<Minus>" shape=invhouse fillcolor=darkseagreen1 style=filled]
+node0x7fe425c05d60->node0x7fe425c05cc0
+node0x7fe425c05cc0[label="MaOperator<Plus>" shape=invhouse fillcolor=darkseagreen1 style=filled]
+node0x7fe425c05cc0->node0x7fe425c05b80
+node0x7fe425c05b80[label="Number<123>" shape=oval fillcolor=pink style=filled]
+node0x7fe425c05cc0->node0x7fe425c05c70
+node0x7fe425c05c70[label="MaOperator<Mul>" shape=invhouse fillcolor=darkseagreen1 style=filled]
+node0x7fe425c05c70->node0x7fe425c05bd0
+node0x7fe425c05bd0[label="Number<23>" shape=oval fillcolor=pink style=filled]
+node0x7fe425c05c70->node0x7fe425c05c20
+node0x7fe425c05c20[label="Number<12>" shape=oval fillcolor=pink style=filled]
+node0x7fe425c05d60->node0x7fe425c05d10
+node0x7fe425c05d10[label="Number<6>" shape=oval fillcolor=pink style=filled]
 }
