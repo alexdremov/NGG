@@ -64,13 +64,13 @@ Language with the power of the legend.
 
 # Example
 
-'''
+```
 never gonna giveYouUp() strangers
     make you coffee = 123 bdum
     coffee += 1 bdum
     goodbye coffee bdum
     known each other for so long coffee bdum
 to love
-'''
+```
 
 <img style="max-width: 100px" src="https://github.com/AlexRoar/NGG/raw/main/Assets/code.svg">
