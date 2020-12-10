@@ -4,6 +4,9 @@ Never gonna give you up programming language
 Language with the power of the legend.
 
 # Syntax
+
+[Beautiful PDF](https://github.com/AlexRoar/NGG/raw/main/NGG.pdf)
+
 *Main*
 
 	  Start            ::= {FuncDecl | VarDefStmt}*
