@@ -4,24 +4,37 @@
 
 #ifndef NGG_AST_H
 #define NGG_AST_H
+
 #include "ASTNode.h"
 #include "SwiftyList/SwiftyList.hpp"
 #include "LexicalAnalysis/Lexeme.h"
 #include "Helpers/Optional.h"
 #include "ParsePosition.h"
+#include "Helpers/Stack.h"
+#include "ASTError.h"
 
-#define EXPECT_LEXEME(lex, type) (lex.getType() == type)
+#define LEX_SET_IF_NONE(storage, lex) \
+if (expectLexAndMove(pos, lex) && storage == Lex_None) { \
+    storage = lex; \
+}
 
 namespace NGG {
     class AST {
-        ASTNode* head;
+        char* codeStart;
+        ASTNode *head;
+        ClassicStack<ASTError> errorStack;
 
-        static bool expectLex(ParsePosition& pos, LexemeType type){
+        void error(ParsePosition &pos, const char *msg) {
+            ASTError err = {pos.get(), msg};
+            errorStack.push(err);
+        }
+
+        static bool expectLex(ParsePosition &pos, LexemeType type) {
             Lexeme lex = pos.get();
             return type == lex.getType();
         }
 
-        static bool expectLexAndMove(ParsePosition& pos, LexemeType type){
+        static bool expectLexAndMove(ParsePosition &pos, LexemeType type) {
             Lexeme lex = pos.get();
             bool res = type == lex.getType();
             if (res)
@@ -29,78 +42,91 @@ namespace NGG {
             return res;
         }
 
-        static ASTNode* getNoneNode(){
-            ASTNode* node = ASTNode::New(); node->cTor();
+        static ASTNode *getNoneNode() {
+            ASTNode *node = ASTNode::New();
+            node->cTor();
             return node;
         }
 
-        static Lexeme getNoneLexeme(){
-            Lexeme lex{}; lex.cTor(Lex_None);
+        static Lexeme getNoneLexeme() {
+            Lexeme lex {};
+            lex.cTor(Lex_None);
             return lex;
         }
 
-        static Optional<ASTNode*> p_FuncDecl(ParsePosition& pos) {
-            Optional<ASTNode*> retValue{}; retValue.cTor();
+        Optional<ASTNode *> p_FuncDecl(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
 
-            if (!expectLexAndMove(pos, Lex_FDecl))
+            if (!expectLexAndMove(pos, Lex_FDecl)) {
                 return retValue;
+            }
 
-            if (!expectLex(pos, Lex_Identifier))
+            if (!expectLex(pos, Lex_Identifier)) {
+                error(pos, "Identifier expected in function declaration");
                 return retValue;
+            }
 
             Lexeme name = pos.getMove();
 
-            if (!expectLexAndMove(pos, Lex_LPA))
+            if (!expectLexAndMove(pos, Lex_LPA)) {
+                error(pos, "Left parenthesis expected in function arg list");
                 return retValue;
+            }
 
-            Optional<ASTNode*> argList = p_ArgumentsList(pos);
-            if (!argList.hasValue()){
+            Optional<ASTNode *> argList = p_ArgumentsList(pos);
+            if (!argList.hasValue()) {
                 argList.cTor(getNoneNode());
             }
 
             if (!expectLexAndMove(pos, Lex_RPA)) {
+                error(pos, "Right parenthesis expected in function arg list");
                 argList.unwrap()->dTor();
                 return retValue;
             }
 
-            Optional<ASTNode*> blockStmt = p_BlockStmt(pos);
-            if (!blockStmt.hasValue()){
+            Optional<ASTNode *> blockStmt = p_BlockStmt(pos);
+            if (!blockStmt.hasValue()) {
+                error(pos, "Block statement expected in function definition");
                 return retValue;
             }
 
-            ASTNode* node = ASTNode::New();
+            ASTNode *node = ASTNode::New();
             node->cTor(Kind_FuncDecl, name, argList.unwrap(), blockStmt.unwrap());
 
             retValue.cTor(node);
             return retValue;
         }
 
-        static Optional<ASTNode*> p_ArgumentsList(ParsePosition& pos) {
-            Optional<ASTNode*> retValue{}; retValue.cTor();
+        Optional<ASTNode *> p_ArgumentsList(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
 
             if (!expectLex(pos, Lex_Identifier))
                 return retValue;
 
-            ASTNode* linksHead = ASTNode::New();
-            ASTNode* linkEnd = linksHead;
+            ASTNode *linksHead = ASTNode::New();
+            ASTNode *linkEnd = linksHead;
 
             linksHead->cTor(Kind_Linker, Kind_Identifier);
 
             Lexeme lex = pos.getMove();
 
-            ASTNode* newNode = ASTNode::New();
+            ASTNode *newNode = ASTNode::New();
             newNode->cTor(Kind_Identifier, lex);
             linkEnd->setLeft(newNode);
 
-            while(!pos.isEnded()) {
+            while (!pos.isEnded()) {
                 if (!expectLexAndMove(pos, Lex_Comma))
                     break;
 
                 lex = pos.getMove();
-                if (lex.getType() != Lex_Identifier)
+                if (lex.getType() != Lex_Identifier) {
+                    error(pos, "Identifier expected after comma in arg list");
                     return retValue;
+                }
 
-                ASTNode* newLinkNode = ASTNode::New();
+                ASTNode *newLinkNode = ASTNode::New();
                 newLinkNode->cTor(Kind_Linker, Kind_Identifier);
 
                 newNode = ASTNode::New();
@@ -115,43 +141,55 @@ namespace NGG {
             return retValue;
         }
 
-        static Optional<ASTNode*> p_BlockStmt(ParsePosition& pos) {
-            Optional<ASTNode*> retValue{}; retValue.cTor();
+        Optional<ASTNode *> p_BlockStmt(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
 
             if (!expectLexAndMove(pos, Lex_BStart))
                 return retValue;
 
-            ASTNode* linksHead = nullptr;
-            ASTNode* linkEnd = nullptr;
+            ASTNode *linksHead = nullptr;
+            ASTNode *linkEnd = nullptr;
 
-            while(!pos.isEnded()) {
-                Optional<ASTNode*> statement = p_Statement(pos);
+            while (!pos.isEnded()) {
+                Optional<ASTNode *> statement = p_Statement(pos);
                 if (!statement.hasValue())
                     break;
 
                 if (linksHead == nullptr) {
-                    linksHead =  ASTNode::New();
+                    linksHead = ASTNode::New();
                     linksHead->cTor(Kind_Linker, Kind_Statement);
                     linkEnd = linksHead;
                 }
 
-                if (linkEnd->getLeft() != nullptr){
-                    ASTNode* linksNew = ASTNode::New();
+                if (linkEnd->getLeft() != nullptr) {
+                    ASTNode *linksNew = ASTNode::New();
                     linksNew->cTor(Kind_Linker, Kind_Statement);
+                    linkEnd->setRight(linksNew);
                     linkEnd = linksNew;
                 }
                 linkEnd->setLeft(statement.unwrap());
             }
 
-            if (!expectLexAndMove(pos, Lex_BEnd))
+            if (!expectLexAndMove(pos, Lex_BEnd)) {
+                error(pos, "No block end found");
                 return retValue;
+            }
 
+            if (linksHead == nullptr)
+                linksHead = getNoneNode();
+
+            retValue.cTor(linksHead);
             return retValue;
         }
 
-        static Optional<ASTNode*> p_Statement(ParsePosition& pos) {
-            Optional<ASTNode*> retValue{}; retValue.cTor();
-            Optional<ASTNode*> content{}; content.cTor();
+        Optional<ASTNode *> p_Statement(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+            Optional<ASTNode *> content {};
+            content.cTor();
+
+            size_t checkpoint = pos.getPos();
 
             content = p_VarDef(pos);
             if (!content.hasValue())
@@ -163,9 +201,11 @@ namespace NGG {
             if (!content.hasValue())
                 content = p_FuncCall(pos);
 
-            if (content.hasValue()){
-                if(!expectLexAndMove(pos, Lex_StEnd))
+            if (content.hasValue()) {
+                if (!expectLexAndMove(pos, Lex_StEnd)){
+                    pos.restore(checkpoint);
                     return retValue;
+                }
             } else {
                 content = p_ReturnStmt(pos);
                 if (!content.hasValue())
@@ -181,37 +221,624 @@ namespace NGG {
             return content;
         }
 
-        static Optional<ASTNode*> p_VarDef(ParsePosition& pos) {
-            Optional<ASTNode*> retValue{}; retValue.cTor();
+        Optional<ASTNode *> p_VarDef(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
 
-            
+            if (!expectLexAndMove(pos, Lex_VDecl))
+                return retValue;
+
+            if (!expectLex(pos, Lex_Identifier)) {
+                error(pos, "No identifier after var definition");
+                return retValue;
+            }
+
+            Lexeme name = pos.getMove();
+            auto *node = ASTNode::New();
+            node->cTor(Kind_VarDef, name);
+
+            if (expectLexAndMove(pos, Lex_Assg)) {
+                Optional<ASTNode *> value = p_rValue(pos);
+                if (!value.hasValue()) {
+                    error(pos, "No rvalue found after assignment in var declaration");
+                    return retValue;
+                }
+                node->setLeft(value.unwrap());
+            } else {
+                node->setLeft(getNoneNode());
+            }
+            retValue.cTor(node);
+            return retValue;
+        }
+
+        Optional<ASTNode *> p_VarDefStmt(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            Optional<ASTNode *> assg = p_VarDef(pos);
+
+            if (!assg.hasValue())
+                return retValue;
+
+            if (!expectLexAndMove(pos, Lex_StEnd)) {
+                error(pos, "No statement end after var assignment in VarDefStmt");
+                return retValue;
+            }
+
+            auto *node = ASTNode::New();
+            node->cTor(Kind_Statement, getNoneLexeme(), assg.unwrap());
+            retValue.cTor(node);
+            return retValue;
+        }
+
+        Optional<ASTNode *> p_rValue(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            Optional<ASTNode *> firstValue = p_AddSubExpr(pos);
+
+            if (!firstValue.hasValue())
+                return retValue;
+
+            LexemeType op = Lex_None;
+            LEX_SET_IF_NONE(op, Lex_Eq)
+            else LEX_SET_IF_NONE(op, Lex_Leq)
+            else LEX_SET_IF_NONE(op, Lex_Geq)
+            else LEX_SET_IF_NONE(op, Lex_Neq)
+            else LEX_SET_IF_NONE(op, Lex_Gr)
+            else LEX_SET_IF_NONE(op, Lex_Le)
+
+            if (op != Lex_None) {
+                Optional<ASTNode *> secondValue = p_AddSubExpr(pos);
+                if (!secondValue.hasValue()) {
+                    error(pos, "No second operand found after condition operator");
+                    return retValue;
+                }
+
+                auto *opNode = ASTNode::New();
+                Lexeme opLex {};
+                opLex.cTor(op);
+                opNode->cTor(Kind_CmpOperator, opLex, firstValue.unwrap(), secondValue.unwrap());
+                retValue.cTor(opNode);
+                return retValue;
+            } else {
+                retValue.cTor(firstValue.unwrap());
+                return retValue;
+            }
+        }
+
+        Optional<ASTNode *> p_AddSubExpr(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            Optional<ASTNode *> firstValue = p_MulDivExpr(pos);
+
+            if (!firstValue.hasValue())
+                return retValue;
+
+            LexemeType op = Lex_None;
+
+            LEX_SET_IF_NONE(op, Lex_Plus)
+            else LEX_SET_IF_NONE(op, Lex_Minus)
+
+            if (op != Lex_None) {
+                Optional<ASTNode *> secondValue = p_MulDivExpr(pos);
+                if (!secondValue.hasValue()) {
+                    error(pos, "No second operand found after +/- operator");
+                    return retValue;
+                }
+                auto *opNode = ASTNode::New();
+                Lexeme opLex {};
+                opLex.cTor(op);
+                opNode->cTor(Kind_MaOperator, opLex, firstValue.unwrap(), secondValue.unwrap());
+                retValue.cTor(opNode);
+                return retValue;
+            } else {
+                retValue.cTor(firstValue.unwrap());
+                return retValue;
+            }
+        }
+
+        Optional<ASTNode *> p_MulDivExpr(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            Optional<ASTNode *> firstValue = p_UnaryExpr(pos);
+
+            if (!firstValue.hasValue())
+                return retValue;
+
+            LexemeType op = Lex_None;
+
+            LEX_SET_IF_NONE(op, Lex_Mul)
+            else LEX_SET_IF_NONE(op, Lex_Div)
+
+            if (op != Lex_None) {
+                Optional<ASTNode *> secondValue = p_UnaryExpr(pos);
+                if (!secondValue.hasValue()) {
+                    error(pos, "No second operand found after */ operator");
+                    return retValue;
+                }
+
+                auto *opNode = ASTNode::New();
+                Lexeme opLex {};
+                opLex.cTor(op);
+                opNode->cTor(Kind_MaOperator, opLex, firstValue.unwrap(), secondValue.unwrap());
+                retValue.cTor(opNode);
+                return retValue;
+            } else {
+                retValue.cTor(firstValue.unwrap());
+                return retValue;
+            }
+        }
+
+        Optional<ASTNode *> p_UnaryExpr(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            LexemeType op = Lex_None;
+
+            LEX_SET_IF_NONE(op, Lex_Plus)
+            else LEX_SET_IF_NONE(op, Lex_Minus)
+            Optional<ASTNode *> value = p_PrimaryExpr(pos);
+
+            if (op != Lex_None) {
+                if (!value.hasValue()) {
+                    error(pos, "No value found in unary after +/-");
+                    return retValue;
+                }
+                auto *opNode = ASTNode::New();
+                Lexeme opLex {};
+                opLex.cTor(op);
+                opNode->cTor(Kind_MaUnOperator, opLex, value.unwrap(), nullptr);
+                retValue.cTor(opNode);
+                return retValue;
+            } else {
+                if (!value.hasValue()) {
+                    return retValue;
+                }
+                retValue.cTor(value.unwrap());
+                return retValue;
+            }
+        }
+
+        Optional<ASTNode *> p_PrimaryExpr(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            if (expectLexAndMove(pos, Lex_LPA)) {
+                Optional<ASTNode *> value = p_rValue(pos);
+                if (!value.hasValue()) {
+                    error(pos, "No value found in parenthesis");
+                    return retValue;
+                }
+                if (!expectLexAndMove(pos, Lex_RPA)) {
+                    error(pos, "No closing parenthesis");
+                    return retValue;
+                }
+
+                retValue.cTor(value.unwrap());
+                return retValue;
+            } else if (expectLex(pos, Lex_Number)) {
+                Lexeme num = pos.getMove();
+
+                auto *node = ASTNode::New();
+                node->cTor(Kind_Number, num);
+                retValue.cTor(node);
+                return retValue;
+            }
+
+            Optional<ASTNode *> funcCall = p_FuncCall(pos);
+            if (funcCall.hasValue()) {
+                retValue.cTor(funcCall.unwrap());
+                return retValue;
+            } else if (expectLex(pos, Lex_Identifier)) {
+                Lexeme id = pos.getMove();
+                auto *node = ASTNode::New();
+                node->cTor(Kind_Identifier, id);
+                retValue.cTor(node);
+                return retValue;
+            }
+            return retValue;
+        }
+
+        Optional<ASTNode *> p_FuncCall(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            if (!expectLex(pos, Lex_Identifier))
+                return retValue;
+
+            Lexeme name = pos.getMove();
+            if (!expectLexAndMove(pos, Lex_LPA)) {
+                --pos;
+                return retValue;
+            }
+
+            Optional<ASTNode *> callList = p_CallList(pos);
+
+            if (!callList.hasValue()) {
+                callList.cTor(getNoneNode());
+            }
+
+            if (!expectLexAndMove(pos, Lex_RPA)) {
+                error(pos, "No closing parenthesis after arg list");
+                return retValue;
+            }
+
+            auto *node = ASTNode::New();
+            node->cTor(Kind_FuncCall, name, callList.unwrap());
+            retValue.cTor(node);
 
             return retValue;
         }
+
+        Optional<ASTNode *> p_CallList(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            Optional<ASTNode *> firstArg = p_rValue(pos);
+            if (!firstArg.hasValue())
+                return retValue;
+
+            ASTNode *linksHead = ASTNode::New();
+            ASTNode *linkEnd = linksHead;
+
+            linksHead->cTor(Kind_Linker, Kind_rValue);
+            linkEnd->setLeft(firstArg.unwrap());
+
+            while (!pos.isEnded()) {
+                if (!expectLexAndMove(pos, Lex_Comma))
+                    break;
+
+                Optional<ASTNode *> nextArg = p_rValue(pos);
+
+                if (!nextArg.hasValue()) {
+                    error(pos, "No argument found after comma in arg list");
+                    return retValue;
+                }
+
+                ASTNode *newLinkNode = ASTNode::New();
+                newLinkNode->cTor(Kind_Linker, Kind_rValue);
+                newLinkNode->setLeft(nextArg.unwrap());
+
+                linkEnd->setRight(newLinkNode);
+                linkEnd = newLinkNode;
+            }
+
+            retValue.cTor(linksHead);
+            return retValue;
+        }
+
+        Optional<ASTNode *> p_ReturnStmt(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            if (!expectLexAndMove(pos, Lex_Return))
+                return retValue;
+
+            Optional<ASTNode *> value = p_rValue(pos);
+
+            if (!value.hasValue()) {
+                error(pos, "No value found after function return keyword");
+                return retValue;
+            }
+
+            if (!expectLexAndMove(pos, Lex_StEnd)) {
+                error(pos, "No bdum after return statement");
+                return retValue;
+            }
+
+            auto *node = ASTNode::New();
+            node->cTor(Kind_ReturnStmt, getNoneLexeme(), value.unwrap());
+            retValue.cTor(node);
+            return retValue;
+        }
+
+        Optional<ASTNode *> p_AssignExpr(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            if (!expectLex(pos, Lex_Identifier))
+                return retValue;
+
+            Lexeme name = pos.getMove();
+            LexemeType op = Lex_None;
+
+            LEX_SET_IF_NONE(op, Lex_Assg)
+            else LEX_SET_IF_NONE(op, Lex_AdAssg)
+            else LEX_SET_IF_NONE(op, Lex_MiAssg)
+            else LEX_SET_IF_NONE(op, Lex_MuAssg)
+            else LEX_SET_IF_NONE(op, Lex_DiAssg)
+
+            if (op == Lex_None) {
+                --pos;
+                return retValue;
+            }
+            Optional<ASTNode *> value = p_rValue(pos);
+            if (!value.hasValue()) {
+                error(pos, "No value after assign-type operator");
+                return retValue;
+            }
+
+            auto *node = ASTNode::New();
+            auto *nodeId = ASTNode::New();
+            nodeId->cTor(Kind_Identifier, name);
+
+            Lexeme opLex {};
+            opLex.cTor(op);
+            node->cTor(Kind_AssignExpr, opLex, value.unwrap(), nodeId);
+
+            retValue.cTor(node);
+            return retValue;
+        }
+
+        Optional<ASTNode *> p_Print(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            if (!expectLexAndMove(pos, Lex_Print))
+                return retValue;
+
+            Optional<ASTNode *> value = p_rValue(pos);
+            if (!value.hasValue()) {
+                error(pos, "No value after print req");
+                return retValue;
+            }
+
+            auto *node = ASTNode::New();
+            node->cTor(Kind_Print, getNoneLexeme(), value.unwrap());
+            retValue.cTor(node);
+            return retValue;
+        }
+
+        Optional<ASTNode *> p_PrintLine(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            if (!expectLexAndMove(pos, Lex_PrintL))
+                return retValue;
+
+            Optional<ASTNode *> value = p_rValue(pos);
+            if (!value.hasValue()) {
+                error(pos, "No value after printLine req");
+                return retValue;
+            }
+
+            auto *node = ASTNode::New();
+            node->cTor(Kind_PrintLine, getNoneLexeme(), value.unwrap());
+            retValue.cTor(node);
+            return retValue;
+        }
+
+        Optional<ASTNode *> p_IfStmt(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            if (!expectLexAndMove(pos, Lex_If))
+                return retValue;
+
+            if (!expectLexAndMove(pos, Lex_LPA)) {
+                error(pos, "No open parenthesis after if");
+                return retValue;
+            }
+
+            Optional<ASTNode *> cond = p_rValue(pos);
+            if (!cond.hasValue()) {
+                error(pos, "Invalid if condition");
+                return retValue;
+            }
+
+            if (!expectLexAndMove(pos, Lex_RPA)) {
+                error(pos, "No close parenthesis after condition");
+                return retValue;
+            }
+
+            Optional<ASTNode *> posStmt = p_BlockStmt(pos);
+
+            if (!posStmt.hasValue()) {
+                error(pos, "No block statement after if");
+                return retValue;
+            }
+
+            Optional<ASTNode *> elseStmt {};
+            elseStmt.cTor();
+
+            if (expectLexAndMove(pos, Lex_Else)) {
+                elseStmt = p_BlockStmt(pos);
+                if (!elseStmt.hasValue()) {
+                    error(pos, "No block statement after if-else");
+                    return retValue;
+                }
+            }
+
+            if (!elseStmt.hasValue())
+                elseStmt.cTor(getNoneNode());
+
+            auto *fork = ASTNode::New();
+            fork->cTor(Kind_Linker, Kind_IfStmt, posStmt.unwrap(), elseStmt.unwrap());
+
+            auto *node = ASTNode::New();
+            node->cTor(Kind_IfStmt, getNoneLexeme(), cond.unwrap(), fork);
+            retValue.cTor(node);
+            return retValue;
+        }
+
+        Optional<ASTNode *> p_WhileStmt(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            if (!expectLexAndMove(pos, Lex_While))
+                return retValue;
+
+            if (!expectLexAndMove(pos, Lex_LPA)) {
+                error(pos, "No open parenthesis after condition");
+                return retValue;
+            }
+
+            Optional<ASTNode *> cond = p_rValue(pos);
+            if (!cond.hasValue()) {
+                error(pos, "Invalid if condition");
+                return retValue;
+            }
+
+            if (!expectLexAndMove(pos, Lex_RPA)) {
+                error(pos, "No close parenthesis after condition");
+                return retValue;
+            }
+
+            Optional<ASTNode *> exec = p_BlockStmt(pos);
+
+            if (!exec.hasValue()) {
+                error(pos, "No blovk statement after while");
+                return retValue;
+            }
+
+            auto *node = ASTNode::New();
+            node->cTor(Kind_WhileStmt, getNoneLexeme(), cond.unwrap(), exec.unwrap());
+            retValue.cTor(node);
+            return retValue;
+        }
+
+        void recursiveDump(FILE *file, ASTNode *node) {
+            if (!node)
+                return;
+
+            if (node->getKind() == Kind_Number) {
+                fprintf(file, "node%p[label=\"Number<%lg>\" shape=oval fillcolor=pink style=filled]\n", node,
+                        node->getLexeme().getDouble());
+            } else if (node->getKind() == Kind_Identifier) {
+                fprintf(file, "node%p[label=\"ID<%s>\" shape=oval fillcolor=aquamarine style=filled]\n", node,
+                        node->getLexeme().getString().begin());
+            } else {
+                if (node->getLexeme().isStringUsed())
+                    fprintf(file, "node%p[label=\"%s<%s<%s>>\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
+                            node,
+                            ASTNodeKindToString(node->getKind()), lexemeTypeToString(node->getLexeme().getType()),
+                            node->getLexeme().getString().begin());
+                else if (node->getKind() == Kind_Linker)
+                    fprintf(file, "node%p[label=\"%s<%lg>\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
+                            node,
+                            ASTNodeKindToString(node->getKind()), node->getLexeme().getDouble());
+                else
+                    fprintf(file, "node%p[label=\"%s<%s>\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
+                            node,
+                            ASTNodeKindToString(node->getKind()), lexemeTypeToString(node->getLexeme().getType()));
+
+            }
+
+
+            if (node->getLeft()) {
+                fprintf(file, "node%p->node%p\n", node, node->getLeft());
+                recursiveDump(file, node->getLeft());
+            }
+            if (node->getRight()) {
+                fprintf(file, "node%p->node%p\n", node, node->getRight());
+                recursiveDump(file, node->getRight());
+            }
+        }
+
+        static void getOffsets(const char* offset, const char* start, size_t& line, size_t& col) {
+            col = 0;
+            line = 0;
+            while (start <= offset){
+                if (*start == '\n'){
+                    line++;
+                    col = 0;
+                }
+                col++;
+                start++;
+            }
+        }
+
     public:
         void cTor() {
-
+            codeStart = nullptr;
+            this->errorStack.cTor(0);
         }
 
         void dTor() {
-
+            this->errorStack.dTor();
         }
 
-        static ASTNode* New(){
-            auto* ob = static_cast<ASTNode*>(calloc(1, sizeof(ASTNode)));
+        static ASTNode *New() {
+            auto *ob = static_cast<ASTNode *>(calloc(1, sizeof(ASTNode)));
             ob->cTor();
             return ob;
         }
 
-        static void Delete(ASTNode* ob){
+        static void Delete(ASTNode *ob) {
             ob->dTor();
             free(ob);
         }
 
-        void parse(SwiftyList<Lexeme>* input) {
+        void parse(SwiftyList<Lexeme> &input) {
+            ParsePosition pos {};
+            pos.cTor(&input);
 
+            if (!input.isEmpty()){
+                Lexeme tmp{}; tmp.cTor();
+                input.get(input.begin(), &tmp);
+                codeStart = tmp.getCodeOffset();
+            }
+
+            auto res = p_FuncDecl(pos);
+            if (!res.hasValue()) {
+                res = p_VarDefStmt(pos);
+                if (!res.hasValue()) {
+                    error(pos, "Undefined root sequence");
+                    head = nullptr;
+                    return;
+                }
+            }
+
+            ASTNode *linksHead = ASTNode::New();
+            ASTNode *linkEnd = linksHead;
+
+            linksHead->cTor(Kind_Linker, Kind_SourceRoot);
+            linkEnd->setLeft(res.unwrap());
+
+            while (!pos.isEnded()) {
+                if (pos.get().getType() == Lex_None){
+                    ++pos;
+                    continue;
+                }
+                res = p_FuncDecl(pos);
+                if (!res.hasValue()) {
+                    res = p_VarDefStmt(pos);
+                    if (!res.hasValue()) {
+                        error(pos, "Undefined root sequence");
+                        head = nullptr;
+                        return;
+                    }
+                }
+
+                ASTNode *newLinkNode = ASTNode::New();
+                newLinkNode->cTor(Kind_Linker, Kind_SourceRoot);
+                newLinkNode->setLeft(res.unwrap());
+
+                linkEnd->setRight(newLinkNode);
+                linkEnd = newLinkNode;
+            }
+            head = linksHead;
         }
 
+        void dumpTree(FILE *file) {
+            fprintf(file, "digraph structure {\n");
+            recursiveDump(file, head);
+            fprintf(file, "}\n");
+        }
+
+        void dumpErrorStack() {
+            ASTError *storage = errorStack.getStorage();
+
+            printf("\n");
+            for (int i = 0; i < errorStack.getSize(); i++) {
+                size_t line=0, col=0;
+                getOffsets(storage[i].errorIt.getCodeOffset(), codeStart, line, col);
+                printf("%s at %s:%zu:%zu\n", storage[i].errorMsg, lexemeTypeToString(storage[i].errorIt.getType()), line + 1, col);
+            }
+        }
     };
 }
 

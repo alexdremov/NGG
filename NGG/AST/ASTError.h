@@ -4,5 +4,14 @@
 
 #ifndef NGG_ASTERROR_H
 #define NGG_ASTERROR_H
+#include <cstdlib>
+#include "LexicalAnalysis/Lexeme.h"
+
+namespace NGG {
+    struct ASTError {
+        Lexeme      errorIt;
+        const char *errorMsg;
+    };
+}
 
 #endif //NGG_ASTERROR_H

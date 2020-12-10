@@ -6,14 +6,14 @@
 #define NGG_ASTNODEKIND_H
 namespace NGG {
     enum ASTNodeKind {
-        #define KIND(l) l,
+        #define KIND(l) Kind_ ## l,
         #include "ASTNodeKind.mpl"
         #undef KIND
     };
 
     static const char* ASTNodeKindToString(ASTNodeKind type){
         const char* result = "<none>";
-        #define KIND(l) if (type == l) return #l;
+        #define KIND(l) if (type ==  Kind_ ## l) return #l;
         #include "ASTNodeKind.mpl"
         #undef KIND
         return result;

@@ -49,6 +49,14 @@ namespace NGG {
             return tmp;
         }
 
+        [[nodiscard]] size_t getPos() const {
+            return it;
+        }
+
+        void restore(size_t pos) {
+            it = pos;
+        }
+
         [[nodiscard]] Lexeme getMove() {
             Lexeme tmp {};
             tmp.cTor();

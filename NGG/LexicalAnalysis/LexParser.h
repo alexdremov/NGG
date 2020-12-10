@@ -13,10 +13,10 @@
 #define PARSE_SYMBOL(sym, type) \
     Optional<Lexeme> retVal{}; retVal.cTor();\
     skipInvis(ptr);\
-    \
+    char* offset = ptr;\
     if (*ptr != sym)\
         return retVal;          \
-    Lexeme parsed{}; parsed.cTor(type, ptr); \
+    Lexeme parsed{}; parsed.cTor(type, offset); \
     ptr++;                    \
     retVal.cTor(parsed);\
     return retVal;
@@ -53,7 +53,7 @@ namespace NGG {
         return false;
     }
 
-    static Optional<Lexeme> tryParseNumberInt(char *&ptr) {
+    static Optional<Lexeme> tryParseLex_NumberInt(char *&ptr) {
         Optional<Lexeme> retVal {};
         retVal.cTor();
         skipInvis(ptr);
@@ -95,6 +95,7 @@ namespace NGG {
         Optional<Lexeme> retVal {};
         retVal.cTor();
         skipInvis(ptr);
+        char *initPtr = ptr;
 
         String identifier {};
         identifier.cTor();
@@ -109,7 +110,7 @@ namespace NGG {
                 identifier.append(*ptr);
                 ptr++;
             } else {
-                auto number = tryParseNumberInt(ptr);
+                auto number = tryParseLex_NumberInt(ptr);
                 if (!number.hasValue())
                     break;
                 identifier.sEndPrintf(20, "%d", (int) number->getDouble());
@@ -117,7 +118,7 @@ namespace NGG {
         }
 
         Lexeme parsed {};
-        parsed.cTor(Lex_Identifier, identifier, ptr);
+        parsed.cTor(Lex_Identifier, identifier, initPtr);
         retVal.cTor(parsed);
         return retVal;
     };
@@ -238,46 +239,29 @@ namespace NGG {
         PARSE_PHRASE("run around", Lex_While)
     };
 
+    static Optional<NGG::Lexeme> tryParseLex_None(char *&ptr) {
+        PARSE_SYMBOL(0, Lex_None)
+    };
+
     static SwiftyList<NGG::Lexeme> lexParse(String *content) {
         auto result = SwiftyList<NGG::Lexeme>(0, 0, nullptr, false);
         char *ptr = content->begin();
 
         #define CHECK_SUCCESS if (parsed.hasValue()){result.pushBack(parsed.unwrap()); continue;}
-        #define TRY_PARSE(type) parsed = tryParseLex_ ## type(ptr); CHECK_SUCCESS
+        #define TRY_PARSE(type) parsed = tryParse ## type(ptr); CHECK_SUCCESS
 
         for (; ptr < content->end();) {
             Optional<NGG::Lexeme> parsed{}; parsed.cTor();
 
-            TRY_PARSE(FDecl);
-            TRY_PARSE(BStart);
-            TRY_PARSE(BEnd);
-            TRY_PARSE(StEnd);
-            TRY_PARSE(Return);
-            TRY_PARSE(VDecl);
-            TRY_PARSE(Print);
-            TRY_PARSE(PrintL);
-            TRY_PARSE(If);
-            TRY_PARSE(Else);
-            TRY_PARSE(While);
-            TRY_PARSE(LPA);
-            TRY_PARSE(RPA);
-            TRY_PARSE(Comma);
-            TRY_PARSE(Eq);
-            TRY_PARSE(Assg);
-            TRY_PARSE(Leq);
-            TRY_PARSE(Geq);
-            TRY_PARSE(Neq);
-            TRY_PARSE(Gr);
-            TRY_PARSE(Le);
-            TRY_PARSE(Plus);
-            TRY_PARSE(Minus);
-            TRY_PARSE(Identifier);
-            TRY_PARSE(Number);
+            #define LEXEME(l) TRY_PARSE(Lex_ ## l);
+            #include "LexemeType.mpl"
+            #undef LEXEME
 
             printf("Undefined sequence at \"%s\"\n", ptr);
         }
 
         #undef CHECK_SUCCESS
+        #undef TRY_PARSE
         return result;
     }
 
