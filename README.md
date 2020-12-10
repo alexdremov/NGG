@@ -36,7 +36,6 @@ Language with the power of the legend.
                          Identifier
     FuncCall         ::= Identifier LPA['('] CallList? RPA[')']
 
-+++
 *Blocks*
 
     BlockStmt        ::= BStart['strangers'] Statement* BEnd['to love']
