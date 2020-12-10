@@ -3,7 +3,6 @@ Never gonna give you up programming language
 
 Language with the power of the legend.
 
-## Syntax
 # Syntax
 *Main*
 
