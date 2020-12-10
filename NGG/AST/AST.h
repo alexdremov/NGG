@@ -717,9 +717,9 @@ namespace NGG {
                             ASTNodeKindToString(node->getKind()), lexemeTypeToString(node->getLexeme().getType()),
                             node->getLexeme().getString().begin());
                 else if (node->getKind() == Kind_Linker)
-                    fprintf(file, "node%p[label=\"%s<%lg>\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
+                    fprintf(file, "node%p[label=\"%s\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
                             node,
-                            ASTNodeKindToString(node->getKind()), node->getLexeme().getDouble());
+                            ASTNodeKindToString(node->getKind()));
                 else
                     fprintf(file, "node%p[label=\"%s<%s>\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
                             node,
