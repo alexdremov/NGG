@@ -64,6 +64,10 @@ public:
         return &(this->data[size - 1]);
     }
 
+    Elem& get(size_t ind){
+        return data[ind];
+    }
+
     [[nodiscard]] Elem *getStorage() const {
         return data;
     }

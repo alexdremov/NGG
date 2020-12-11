@@ -8,7 +8,7 @@ LEXEME(If)
 LEXEME(Else)
 LEXEME(While)
 LEXEME(Print)
-LEXEME(PrintL)
+LEXEME(Input)
 
 LEXEME(LPA)
 LEXEME(RPA)

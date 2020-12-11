@@ -6,7 +6,7 @@
 #define NGG_LEXEME_H
 #include <cstdlib>
 #include "LexemeType.h"
-#include "Helpers/String.h"
+#include "Helpers/StrContainer.h"
 
 namespace NGG {
     class Lexeme {
@@ -16,7 +16,7 @@ namespace NGG {
         size_t     line;
         char*      codeOffset;
         union {
-            String sContent;
+            StrContainer sContent;
             double vContent;
         };
     public:
@@ -27,7 +27,7 @@ namespace NGG {
             stringUsed = false;
         }
 
-        void cTor(LexemeType lexemeType, String content, char* offset= nullptr){
+        void cTor(LexemeType lexemeType, StrContainer content, char* offset= nullptr){
             type = lexemeType;
             sContent = content;
             stringUsed = true;
@@ -87,7 +87,7 @@ namespace NGG {
             return vContent;
         }
 
-        [[nodiscard]] String getString() const{
+        [[nodiscard]] StrContainer getString() const{
             return sContent;
         }
 

@@ -2,14 +2,14 @@
 // Created by Александр Дремов on 09.12.2020.
 //
 
-#ifndef NGG_STRING_H
-#define NGG_STRING_H
+#ifndef NGG_STRCONTAINER_H
+#define NGG_STRCONTAINER_H
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
 
-class String {
+class StrContainer {
     char*  storage;
     size_t len;
     size_t maxLen;
@@ -43,17 +43,19 @@ public:
     }
 
     void dTor(){
-        if (storage)
+        if (storage) {
             free(storage);
+            storage = reinterpret_cast<char *>(0xBADF);
+        }
     }
 
-    static String* New(){
-        auto* ob = static_cast<String*>(calloc(1, sizeof(String)));
+    static StrContainer* New(){
+        auto* ob = static_cast<StrContainer*>(calloc(1, sizeof(StrContainer)));
         ob->cTor();
         return ob;
     }
 
-    static void Delete(String* ob){
+    static void Delete(StrContainer* ob){
         ob->dTor();
         free(ob);
     }
@@ -80,7 +82,7 @@ public:
         storage[len] = '\0';
     }
 
-    void append(String* str) {
+    void append(StrContainer* str) {
         reallocate(str->len + 1);
         strcpy(storage + len, str->storage);
         len += str->len;
@@ -88,11 +90,22 @@ public:
         updateLen();
     }
 
-    void sEndPrintf(size_t additionalSpace, const char * format, ...) {
-        reallocate(additionalSpace);
+    void sEndPrintf(const char * format, ...) {
+        if (!isValid()){
+            printf("Invalid storage");
+            return;
+        }
         va_list args;
         va_start (args, format);
-        vsprintf (storage + len, format, args);
+
+        char* lineAdd = nullptr;
+        vasprintf(&lineAdd, format, args);
+        size_t additionalSpace = strlen(lineAdd);
+
+        reallocate(additionalSpace);
+        sprintf (storage + len, "%s", lineAdd);
+
+        free(lineAdd);
         va_end (args);
         updateLen();
     }
@@ -116,6 +129,10 @@ public:
         storage[fsize] = 0;
         updateLen();
     }
+
+    bool isValid(){
+        return storage != (char*) 0xBADF;
+    }
 };
 
-#endif //NGG_STRING_H
+#endif //NGG_STRCONTAINER_H

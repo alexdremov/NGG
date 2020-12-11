@@ -5,108 +5,132 @@
 #ifndef NGG_SCOPEPROCESSOR_H
 #define NGG_SCOPEPROCESSOR_H
 #include "IdentifierType.h"
-#include "Helpers/String.h"
+#include "Helpers/StrContainer.h"
+#include "Helpers/Stack.h"
 #include "Helpers/Optional.h"
 #include "SwiftyList/SwiftyList.hpp"
 
 namespace NGG {
-    class ScopeProcessor {
-        struct IdCompiler {
-            IdentifierType type;
-            String         name;
-            union {
-                String label;
-                size_t memOffset;
-            };
-
-            bool operator==(const IdCompiler& other){
-                return strcmp(other.name.getStorage(), name.getStorage()) == 0;
-            }
-
-            void cTor(const IdentifierType identifierType, const String identifierName){
-                type = identifierType;
-                name = identifierName;
-            }
-
-            void cTor(const IdentifierType identifierType, const String identifierName, String label){
-                type = identifierType;
-                name = identifierName;
-                label = label;
-            }
-
-            void cTor(const IdentifierType identifierType, const String identifierName, size_t memOffset){
-                type = identifierType;
-                name = identifierName;
-                memOffset = memOffset;
-            }
-
-            void cTor(const String identifierName){
-                type = ID_None;
-                name = identifierName;
-            }
+    struct IdCompiler {
+        IdentifierType type;
+        StrContainer   name;
+        union {
+            StrContainer label;
+            size_t memOffset;
         };
-        size_t                 globOffset;
-        size_t                 locOffset;
-        SwiftyList<IdCompiler> storage;
-    public:
 
-        Optional<IdCompiler> get(const String& id) {
+        bool operator==(const IdCompiler& other){
+            return strcmp(other.name.getStorage(), name.getStorage()) == 0;
+        }
+
+        void cTor(const IdentifierType identifierType, const StrContainer identifierName){
+            type = identifierType;
+            name = identifierName;
+        }
+
+        void cTor(const IdentifierType identifierType, const StrContainer identifierName, StrContainer label){
+            type = identifierType;
+            name = identifierName;
+            label = label;
+        }
+
+        void cTor(const IdentifierType identifierType, const StrContainer identifierName, size_t memOffset){
+            type = identifierType;
+            name = identifierName;
+            memOffset = memOffset;
+        }
+
+        void cTor(const StrContainer identifierName){
+            type = ID_None;
+            name = identifierName;
+        }
+    };
+
+    class ScopeProcessor {
+        size_t locOffset;
+        ClassicStack<SwiftyList<IdCompiler>> storage;
+
+    public:
+        Optional<IdCompiler> get(const StrContainer& id) {
             Optional<IdCompiler> retValue{};
             retValue.cTor();
             IdCompiler tmp{}; tmp.cTor(id);
             size_t pos = 0;
-            auto result = storage.search(&pos, tmp);
+
+            ListOpResult result = LIST_OP_NOTFOUND;
+            int i = storage.getSize() - 1;
+            for (; i >=0; i--){
+                result = storage.get(i).search(&pos, tmp);
+                if (result == LIST_OP_OK) {
+                    break;
+                }
+            }
             if (result == LIST_OP_NOTFOUND) {
                 return retValue;
             }
-            storage.get(pos, &tmp);
+
+            storage.get(i).get(pos, &tmp);
             retValue.cTor(tmp);
             return retValue;
         }
 
-        bool def(const String& id, IdentifierType type, String label){
+        bool def(const StrContainer& id, IdentifierType type, StrContainer label){
             IdCompiler tmp{}; tmp.cTor(type, id);
             auto trySearch = get(id);
             if (trySearch.hasValue())
                 return false;
 
-            storage.pushBack(tmp);
-            return true;
-        }
+            tmp.memOffset = getLocalOffset();
 
-        bool def(const String& id, IdentifierType type){
-            IdCompiler tmp{}; tmp.cTor(type, id);
-            auto trySearch = get(id);
-            if (trySearch.hasValue())
-                return false;
-
-            storage.pushBack(tmp);
-            return true;
-        }
-
-        bool deleteLocal() {
-            for (size_t i = storage.begin(); i !=0; ) {
-                size_t next = storage.nextIterator(i);
-
-                IdCompiler tmp{};
-                storage.get(i, &tmp);
-
-                if (tmp.type == ID_Var) {
-                    storage.remove(i);
-                }
-
-                i = next;
+            if (type == ID_Var || type == ID_VarGlob) {
+                tmp.memOffset = locOffset;
+                locOffset++;
             }
+            if(storage.getSize() == 1 && type == ID_Var)
+                tmp.type = ID_VarGlob;
+            tmp.label = label;
+            storage.top()->pushBack(tmp);
+            return true;
+        }
+
+        bool def(const StrContainer& id, IdentifierType type){
+            IdCompiler tmp{}; tmp.cTor(type, id);
+            auto trySearch = get(id);
+            if (trySearch.hasValue())
+                return false;
+
+            if (type == ID_Var || type == ID_VarGlob) {
+                tmp.memOffset = getLocalOffset();
+                locOffset++;
+            }
+            if(storage.getSize() == 1 && type == ID_Var)
+                tmp.type = ID_VarGlob;
+            storage.top()->pushBack(tmp);
+            return true;
+        }
+
+        void deleteLocal() {
+            storage.top()->dTor();
+            storage.pop();
+        }
+
+        void addNewLevel() {
+            SwiftyList<IdCompiler> newScope{};
+            newScope.cTor(0, 0, nullptr, false);
+            storage.push(newScope);
         }
 
         void cTor() {
-            globOffset = 0;
             locOffset  = 0;
-            storage = SwiftyList<IdCompiler>(1, 0, nullptr, false);
+            storage.cTor(1);
+            addNewLevel();
         }
 
         void dTor() {
-
+            while(!storage.isEmpty()){
+                deleteLocal();
+            }
+            storage.dTor();
         }
 
         static ScopeProcessor *New() {
@@ -119,6 +143,15 @@ namespace NGG {
             ob->dTor();
             free(ob);
         }
+
+        [[nodiscard]] size_t getGlobalOffset() const{
+            return locOffset;
+        }
+
+        [[nodiscard]] size_t getLocalOffset(){
+            return storage.top()->getSize();
+        }
+
     };
 }
 

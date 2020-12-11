@@ -3,26 +3,21 @@
 #include "Compiler/NGGCompiler.h"
 
 int main() {
-    String content {};
-    content.cTor();
-    FILE *sourceCode = fopen("testsource.ngg", "rb");
-    content.readFromFile(sourceCode);
-    fclose(sourceCode);
+    NGG::NGGCompiler compiler{}; compiler.cTor();
 
-    auto res = NGG::LexParser::parse(&content);
-    NGG::LexParser::dumpLexemes(res);
+    compiler.loadFile("testsource.ngg");
+    compiler.dumpErrorStack();
 
-    auto ASTParser = NGG::AST {};
-    ASTParser.cTor();
-
-    ASTParser.parse(res);
-    ASTParser.dumpErrorStack();
-
-    FILE* grDump = fopen("graph.gv", "w");
-    ASTParser.dumpTree(grDump);
-    fclose(grDump);
-
+    FILE* graph = fopen("graph.gv", "wb");
+    compiler.dumpGraph(graph);
+    fclose(graph);
     system("dot -Tsvg graph.gv -o code.svg");
+
+    compiler.compile();
+    compiler.saveAsmSource("asm.spus");
+
+    compiler.genBytecode("asm.spus", "bytecode.spub");
+
 
     return 0;
 }

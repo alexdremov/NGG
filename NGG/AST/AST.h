@@ -194,8 +194,6 @@ namespace NGG {
             if (!content.hasValue())
                 content = p_Print(pos);
             if (!content.hasValue())
-                content = p_PrintLine(pos);
-            if (!content.hasValue())
                 content = p_AssignExpr(pos);
             if (!content.hasValue())
                 content = p_FuncCall(pos);
@@ -216,7 +214,6 @@ namespace NGG {
                 if (!content.hasValue())
                     return retValue;
             }
-
             return content;
         }
 
@@ -279,6 +276,7 @@ namespace NGG {
             if (!firstValue.hasValue())
                 return retValue;
 
+            Lexeme opLex = pos.get();
             LexemeType op = Lex_None;
             LEX_SET_IF_NONE(op, Lex_Eq)
             else LEX_SET_IF_NONE(op, Lex_Leq)
@@ -295,8 +293,6 @@ namespace NGG {
                 }
 
                 auto *opNode = ASTNode::New();
-                Lexeme opLex {};
-                opLex.cTor(op);
                 opNode->cTor(Kind_CmpOperator, opLex, firstValue.unwrap(), secondValue.unwrap());
                 retValue.cTor(opNode);
                 return retValue;
@@ -318,6 +314,7 @@ namespace NGG {
             ASTNode *lastNode = firstValue.unwrap();
 
             while (!pos.isEnded()) {
+                Lexeme opLex = pos.get();
                 LexemeType op = Lex_None;
 
                 LEX_SET_IF_NONE(op, Lex_Plus)
@@ -330,8 +327,6 @@ namespace NGG {
                         return retValue;
                     }
                     auto *opNode = ASTNode::New();
-                    Lexeme opLex {};
-                    opLex.cTor(op);
                     opNode->cTor(Kind_MaOperator, opLex, lastNode, secondValue.unwrap());
                     lastNode = opNode;
                 } else {
@@ -356,6 +351,7 @@ namespace NGG {
             ASTNode *lastNode = firstValue.unwrap();
 
             while (!pos.isEnded()) {
+                Lexeme opLex = pos.get();
                 LexemeType op = Lex_None;
 
                 LEX_SET_IF_NONE(op, Lex_Mul)
@@ -368,8 +364,6 @@ namespace NGG {
                         return retValue;
                     }
                     auto *opNode = ASTNode::New();
-                    Lexeme opLex {};
-                    opLex.cTor(op);
                     opNode->cTor(Kind_MaOperator, opLex, lastNode, secondValue.unwrap());
                     lastNode = opNode;
                 } else {
@@ -386,6 +380,7 @@ namespace NGG {
             Optional<ASTNode *> retValue {};
             retValue.cTor();
 
+            Lexeme opLex = pos.get();
             LexemeType op = Lex_None;
 
             LEX_SET_IF_NONE(op, Lex_Plus)
@@ -398,8 +393,7 @@ namespace NGG {
                     return retValue;
                 }
                 auto *opNode = ASTNode::New();
-                Lexeme opLex {};
-                opLex.cTor(op);
+
                 opNode->cTor(Kind_MaUnOperator, opLex, value.unwrap(), nullptr);
                 retValue.cTor(opNode);
                 return retValue;
@@ -410,6 +404,19 @@ namespace NGG {
                 retValue.cTor(value.unwrap());
                 return retValue;
             }
+        }
+
+        Optional<ASTNode *> p_Input(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            if (expectLexAndMove(pos, Lex_Input)){
+                auto *node = ASTNode::New();
+                node->cTor(Kind_Input, getNoneLexeme());
+                retValue.cTor(node);
+                return retValue;
+            }
+            return retValue;
         }
 
         Optional<ASTNode *> p_PrimaryExpr(ParsePosition &pos) {
@@ -428,6 +435,13 @@ namespace NGG {
                 }
 
                 retValue.cTor(value.unwrap());
+                return retValue;
+            } else if (expectLex(pos, Lex_Input)) {
+                Lexeme lex = pos.getMove();
+
+                auto *node = ASTNode::New();
+                node->cTor(Kind_Input, lex);
+                retValue.cTor(node);
                 return retValue;
             } else if (expectLex(pos, Lex_Number)) {
                 Lexeme num = pos.getMove();
@@ -553,6 +567,7 @@ namespace NGG {
                 return retValue;
 
             Lexeme name = pos.getMove();
+            Lexeme opLex = pos.get();
             LexemeType op = Lex_None;
 
             LEX_SET_IF_NONE(op, Lex_Assg)
@@ -575,8 +590,6 @@ namespace NGG {
             auto *nodeId = ASTNode::New();
             nodeId->cTor(Kind_Identifier, name);
 
-            Lexeme opLex {};
-            opLex.cTor(op);
             node->cTor(Kind_AssignExpr, opLex, value.unwrap(), nodeId);
 
             retValue.cTor(node);
@@ -602,31 +615,13 @@ namespace NGG {
             return retValue;
         }
 
-        Optional<ASTNode *> p_PrintLine(ParsePosition &pos) {
-            Optional<ASTNode *> retValue {};
-            retValue.cTor();
-
-            if (!expectLexAndMove(pos, Lex_PrintL))
-                return retValue;
-
-            Optional<ASTNode *> value = p_rValue(pos);
-            if (!value.hasValue()) {
-                error(pos, "No value after printLine req");
-                return retValue;
-            }
-
-            auto *node = ASTNode::New();
-            node->cTor(Kind_PrintLine, getNoneLexeme(), value.unwrap());
-            retValue.cTor(node);
-            return retValue;
-        }
-
         Optional<ASTNode *> p_IfStmt(ParsePosition &pos) {
             Optional<ASTNode *> retValue {};
             retValue.cTor();
 
-            if (!expectLexAndMove(pos, Lex_If))
+            if (!expectLex(pos, Lex_If))
                 return retValue;
+            Lexeme ifLexeme = pos.getMove();
 
             if (!expectLexAndMove(pos, Lex_LPA)) {
                 error(pos, "No open parenthesis after if");
@@ -669,7 +664,7 @@ namespace NGG {
             fork->cTor(Kind_Linker, Kind_IfStmt, posStmt.unwrap(), elseStmt.unwrap());
 
             auto *node = ASTNode::New();
-            node->cTor(Kind_IfStmt, getNoneLexeme(), cond.unwrap(), fork);
+            node->cTor(Kind_IfStmt, ifLexeme, cond.unwrap(), fork);
             retValue.cTor(node);
             return retValue;
         }
@@ -715,25 +710,28 @@ namespace NGG {
                 return;
 
             if (node->getKind() == Kind_Number) {
-                fprintf(file, "node%p[label=\"Number<%lg>\" shape=oval fillcolor=pink style=filled]\n", node,
-                        node->getLexeme().getDouble());
+                fprintf(file, "node%p[label=\"Number<%lg>:%zu:%zu\" shape=oval fillcolor=pink style=filled]\n", node,
+                        node->getLexeme().getDouble(), node->getLexeme().getLine(),  node->getLexeme().getCol());
             } else if (node->getKind() == Kind_Identifier) {
-                fprintf(file, "node%p[label=\"ID<%s>\" shape=oval fillcolor=aquamarine style=filled]\n", node,
-                        node->getLexeme().getString().begin());
+                fprintf(file, "node%p[label=\"ID<%s>:%zu:%zu\" shape=oval fillcolor=aquamarine style=filled]\n", node,
+                        node->getLexeme().getString().begin(), node->getLexeme().getLine(),  node->getLexeme().getCol());
             } else {
                 if (node->getLexeme().isStringUsed())
-                    fprintf(file, "node%p[label=\"%s<%s<%s>>\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
+                    fprintf(file, "node%p[label=\"%s<%s<%s>>:%zu:%zu\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
                             node,
                             ASTNodeKindToString(node->getKind()), lexemeTypeToString(node->getLexeme().getType()),
-                            node->getLexeme().getString().begin());
+                            node->getLexeme().getString().begin(), node->getLexeme().getLine(),
+                            node->getLexeme().getCol());
                 else if (node->getKind() == Kind_Linker)
                     fprintf(file, "node%p[label=\"%s\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
                             node,
                             ASTNodeKindToString(node->getKind()));
                 else
-                    fprintf(file, "node%p[label=\"%s<%s>\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
+                    fprintf(file, "node%p[label=\"%s<%s>:%zu:%zu\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
                             node,
-                            ASTNodeKindToString(node->getKind()), lexemeTypeToString(node->getLexeme().getType()));
+                            ASTNodeKindToString(node->getKind()), lexemeTypeToString(node->getLexeme().getType()),
+                            node->getLexeme().getLine(),
+                            node->getLexeme().getCol());
 
             }
 
@@ -742,13 +740,13 @@ namespace NGG {
                 if (node->getLeft()->getKind() == Kind_Linker && node->getKind() == node->getLeft()->getKind())
                     fprintf(file, "{rank=same; node%p; node%p}\n", node, node->getLeft());
 
-                fprintf(file, "node%p->node%p\n", node, node->getLeft());
+                fprintf(file, "node%p->node%p[color=green label=L]\n", node, node->getLeft());
                 recursiveDump(file, node->getLeft());
             }
             if (node->getRight()) {
                 if (node->getRight()->getKind() == Kind_Linker && node->getKind() == node->getRight()->getKind())
                     fprintf(file, "{rank=same; node%p; node%p}\n", node, node->getRight());
-                fprintf(file, "node%p->node%p\n", node, node->getRight());
+                fprintf(file, "node%p->node%p[color=red label=R]\n", node, node->getRight());
                 recursiveDump(file, node->getRight());
             }
         }
@@ -829,10 +827,14 @@ namespace NGG {
 
         void dumpErrorStack() {
             ASTError *storage = errorStack.getStorage();
-
-            printf("\n");
-            for (int i = 0; i < errorStack.getSize(); i++) {
-                printf("%s at %s:%zu:%zu\n", storage[i].errorMsg, lexemeTypeToString(storage[i].errorIt.getType()), storage[i].errorIt.getLine() + 1, storage[i].errorIt.getCol() );
+            if (errorStack.isEmpty()){
+                printf("No errors detected\n");
+            } else {
+                printf("\n");
+                for (int i = 0; i < errorStack.getSize(); i++) {
+                    printf("%s at %s:%zu:%zu\n", storage[i].errorMsg, lexemeTypeToString(storage[i].errorIt.getType()),
+                           storage[i].errorIt.getLine() + 1, storage[i].errorIt.getCol());
+                }
             }
         }
 
@@ -842,6 +844,10 @@ namespace NGG {
 
         [[nodiscard]] bool hasError() const{
             return !errorStack.isEmpty();
+        }
+
+        [[nodiscard]] ASTNode * getHead() const{
+            return head;
         }
     };
 }

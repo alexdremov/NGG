@@ -27,7 +27,7 @@
     MulDivExpr       ::= UnaryExpr {(Mul['*'] | Div['/']) UnaryExpr}*
     UnaryExpr        ::= ((Plus['+'] | Minus['-']) PrimaryExpr)
                          | PrimaryExpr
-    PrimaryExpr      ::= LPA['('] rValue RPA[')'] | Number | FuncCall |
+    PrimaryExpr      ::= LPA['('] rValue RPA[')']| Input | Number | FuncCall |
                          Identifier
     FuncCall         ::= Identifier LPA['('] CallList? RPA[')']
 
@@ -35,7 +35,7 @@
 *Blocks*
 
     BlockStmt        ::= BStart['strangers'] Statement* BEnd['to love']
-    Statement        ::= (VarDef | Print | PrintLine | AssignExpr |
+    Statement        ::= (VarDef | Print | AssignExpr |
                           FuncCall)  StEnd['bdum']
                           | ReturnStmt | IfStmt | WhileStmt | BlockStmt
 
@@ -46,7 +46,7 @@
                          rValue |  Identifier )
     VarDefStmt       ::= VarDef StEnd['bdum']
     Print            ::= Print['goodbye']     rValue
-    PrintLine        ::= PrintL['desert you'] rValue
+    Input            ::= Input['ask me']
 
 *Control Sequences*
 

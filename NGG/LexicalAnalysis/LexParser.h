@@ -115,7 +115,7 @@ namespace NGG {
             skipInvis(ptr);
             char *initPtr = ptr;
 
-            String identifier {};
+            StrContainer identifier {};
             identifier.cTor();
 
             if (!isCharacter(*ptr))
@@ -131,7 +131,7 @@ namespace NGG {
                     auto number = tryParseLex_NumberInt(ptr);
                     if (!number.hasValue())
                         break;
-                    identifier.sEndPrintf(20, "%d", (int) number->getDouble());
+                    identifier.sEndPrintf("%d", (int) number->getDouble());
                 }
             }
 
@@ -147,6 +147,10 @@ namespace NGG {
 
         static Optional<NGG::Lexeme> tryParseLex_LPA(char *&ptr) {
             PARSE_SYMBOL('(', Lex_LPA)
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Input(char *&ptr) {
+            PARSE_PHRASE("ask me", Lex_Input)
         };
 
         static Optional<NGG::Lexeme> tryParseLex_RPA(char *&ptr) {
@@ -241,10 +245,6 @@ namespace NGG {
             PARSE_PHRASE("goodbye", Lex_Print)
         };
 
-        static Optional<NGG::Lexeme> tryParseLex_PrintL(char *&ptr) {
-            PARSE_PHRASE("desert you", Lex_PrintL)
-        };
-
         static Optional<NGG::Lexeme> tryParseLex_If(char *&ptr) {
             PARSE_PHRASE("you know the rules", Lex_If)
         };
@@ -262,8 +262,10 @@ namespace NGG {
         };
 
     public:
-        static SwiftyList<NGG::Lexeme> parse(String *content) {
-            auto result = SwiftyList<NGG::Lexeme>(0, 0, nullptr, false);
+        static SwiftyList<NGG::Lexeme> parse(StrContainer *content) {
+            SwiftyList<NGG::Lexeme> result{};
+            result.cTor(0, 0, nullptr, false);
+
             char *ptr = content->begin();
 
             #define CHECK_SUCCESS if (parsed.hasValue()){result.pushBack(parsed.unwrap()); continue;}
