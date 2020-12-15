@@ -9,7 +9,7 @@ Language with the power of the legend.
 
 *Main*
 
-	  Start            ::= {FuncDecl | VarDefStmt}*
+    Start            ::= {FuncDecl | VarDefStmt}*
 
 *Identifier*
 
@@ -32,17 +32,17 @@ Language with the power of the legend.
                         | Neq['!='] | Gr['>']| Le['<']) AddSubExpr}?
     AddSubExpr       ::= MulDivExpr
                          {(Plus['+'] | Minus['-']) MulDivExpr}*
-    MulDivExpr       ::= UnaryExpr {(Mul['*'] | Div['/']) UnaryExpr}*
+    MulDivExpr       ::= UnaryExpr {(Mul['*'] | Div['/'] | Pow['^']) UnaryExpr}*
     UnaryExpr        ::= ((Plus['+'] | Minus['-']) PrimaryExpr)
                          | PrimaryExpr
-    PrimaryExpr      ::= LPA['('] rValue RPA[')'] | Number | FuncCall |
+    PrimaryExpr      ::= LPA['('] rValue RPA[')']| Input | Number | FuncCall |
                          Identifier
     FuncCall         ::= Identifier LPA['('] CallList? RPA[')']
 
 *Blocks*
 
     BlockStmt        ::= BStart['strangers'] Statement* BEnd['to love']
-    Statement        ::= (VarDef | Print | PrintLine | AssignExpr |
+    Statement        ::= (VarDef | Print | AssignExpr |
                           FuncCall)  StEnd['bdum']
                           | ReturnStmt | IfStmt | WhileStmt | BlockStmt
 
@@ -53,7 +53,7 @@ Language with the power of the legend.
                          rValue |  Identifier )
     VarDefStmt       ::= VarDef StEnd['bdum']
     Print            ::= Print['goodbye']     rValue
-    PrintLine        ::= PrintL['desert you'] rValue
+    Input            ::= Input['ask me']
 
 *Control Sequences*
 
@@ -64,15 +64,29 @@ Language with the power of the legend.
                          LPA['('] rValue RPA[')'] BlockStmt
     ReturnStmt       ::= Return['known each other for so long'] rValue  
                          StEnd['bdum']
+# Memory management
+
+… | global variables | stack memory 
+
+| Use | Register |
+|:--|:--|
+| Bp register | rex |
+| Tmp calculations | rax |
+| Tmp calculations2 | rbx |
 
 # Example
 
 ```
 never gonna giveYouUp() strangers
-    make you coffee = 123 bdum
-    coffee += 1 bdum
-    goodbye coffee bdum
-    known each other for so long coffee bdum
+    goodbye fact(ask me) bdum
+to love
+
+never gonna fact(num) strangers
+    you know the rules (num <= 1) strangers
+        known each other for so long 1 bdum
+    to love and so do i strangers
+        known each other for so long fact(num - 1) * num bdum
+    to love
 to love
 ```
 
