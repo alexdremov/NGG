@@ -24,7 +24,7 @@
                         | Neq['!='] | Gr['>']| Le['<']) AddSubExpr}?
     AddSubExpr       ::= MulDivExpr
                          {(Plus['+'] | Minus['-']) MulDivExpr}*
-    MulDivExpr       ::= UnaryExpr {(Mul['*'] | Div['/']) UnaryExpr}*
+    MulDivExpr       ::= UnaryExpr {(Mul['*'] | Div['/'] | Pow['^']) UnaryExpr}*
     UnaryExpr        ::= ((Plus['+'] | Minus['-']) PrimaryExpr)
                          | PrimaryExpr
     PrimaryExpr      ::= LPA['('] rValue RPA[')']| Input | Number | FuncCall |
