@@ -1,7 +1,7 @@
 # NGG
 **Never Gonna Give** (you up) programming language
 
-Language with the power of the legend.
+Language with the power of the legend. Code can be executed on [SPU](https://github.com/AlexRoar/SPUAsm)
 
 # Syntax
 
