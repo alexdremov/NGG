@@ -5,100 +5,157 @@
 #ifndef NGG_NGG_H
 #define NGG_NGG_H
 
-#include "ScopeProcessor.h"
+#include "VarTable.h"
+#include "Helpers/ParamsParser.h"
+#include "Compiler/CompileError.h"
+#include "AST/ASTLoader.h"
 
 namespace NGG {
     class NGGCompiler {
         StrContainer *compiledString;
+        SwiftyList<Lexeme> *parsed;
+        ClassicStack<CompileError> *cErrors;
         AST tree;
-        ScopeProcessor env;
+        VarTable env;
         const char *fileName;
 
         void incRex(size_t num) {
-            compiledString->sEndPrintf(
-                    "; incrementing rex for %zu\n"
-                    "push %zu\n"
-                    "push rex\n"
-                    "add\n"
-                    "pop rex\n"
-                    "; inc complete\n\n",
-                    num, num);
+            if (num == 0)
+                return;
+            else if (num == 1) {
+                compiledString->sEndPrintf(
+                        "; incrementing rex for 1\n"
+                        "inc rex"
+                        "; inc complete\n\n",
+                        num, num);
+            } else {
+                compiledString->sEndPrintf(
+                        "; incrementing rex for %zu\n"
+                        "push %zu\n"
+                        "push rex\n"
+                        "add\n"
+                        "pop rex\n"
+                        "; inc complete\n\n",
+                        num, num);
+            }
+        }
+
+        void decRex(size_t num) {
+            if (num == 0)
+                return;
+            else if (num == 1) {
+                compiledString->sEndPrintf(
+                        "; decrementing rex for 1\n"
+                        "dec rex"
+                        "; dec complete\n\n",
+                        num, num);
+            } else {
+                compiledString->sEndPrintf(
+                        "; decrementing rex for %zu\n"
+                        "push rex\n"
+                        "push %zu\n"
+                        "sub\n"
+                        "pop rex\n"
+                        "; dec complete\n\n",
+                        num, num);
+            }
         }
 
         static StrContainer getJmpLabel(Lexeme lex, const char *specifier = "") {
             StrContainer label {};
             const int randSufLen = 5;
-            label.cTor(static_cast<char *>(calloc(1, sizeof(char))));
+            label.cTor("");
 
             char randSuffix[randSufLen + 1] = "";
             for (unsigned i = 0; i < randSufLen; i++)
                 randSuffix[i] = (char) ('A' + rand() % 24);
             randSuffix[randSufLen] = 0;
-            label.sEndPrintf("lbl_l%zu_c%zu_%s__%s", lex.getLine(), lex.getCol(), specifier, randSuffix);
+            label.sEndPrintf("lbl_%zu_%zu_%s__%s", lex.getLine(), lex.getCol(), specifier, randSuffix);
             return label;
         }
 
-        void decRex(size_t num) {
-            compiledString->sEndPrintf(
-                    "; decrementing rex for %zu\n"
-                    "push rex\n"
-                    "push %zu\n"
-                    "sub\n"
-                    "pop rex\n"
-                    "; dec complete\n\n",
-                    num, num);
-        }
-
-        void varSpecificOperation(const char *operation, IdCompiler var, int incModifier = 0) {
-            if (var.type == ID_VarGlob) {
-                compiledString->sEndPrintf("%s [%zu] ; identifier %s\n ",
-                                           operation, var.memOffset + incModifier, var.name.getStorage());
-            } else if (var.type == ID_Var) {
-                compiledString->sEndPrintf("%s [rex+%zu] ; identifier %s\n",
-                                           operation, var.memOffset + incModifier, var.name.getStorage());
+        void varSpecificOperation(const char *operation, IdCompiler var, int incModifier = 0,
+                                  size_t line = 0, size_t col = 0) {
+            if (var.type == Var_Glob) {
+                compiledString->sEndPrintf("%s [%d] ; identifier %s\n",
+                                           operation, var.memOffset, var.name->getStorage());
+            } else if (var.type == Var_Loc) {
+                if (var.memOffset + incModifier >= 0)
+                    compiledString->sEndPrintf("%s [rex+%d] ; identifier %s\n",
+                                               operation, var.memOffset + incModifier, var.name->getStorage());
+                else
+                    compiledString->sEndPrintf("%s [rex-%d] ; identifier %s\n",
+                                               operation, (-1) * (var.memOffset + incModifier), var.name->getStorage());
             } else {
-                // TODO: error
+                CompileError err {};
+                err.cTor();
+                err.msg = StrContainer::New();
+                err.msg->cTor("Can't treat function like a variable: ");
+                err.msg->sEndPrintf("%s", var.name->begin());
+                err.line = line;
+                err.col = col;
+                cErrors->push(err);
+                return;
             }
         }
 
-        void c_Linker(ASTNode *head, bool valueNeeded) {
+        void c_Linker(ASTNode *head, bool valueNeeded, bool noScope = false) {
+            bool genNewScope = (head->getLinkKind() == Kind_Link_NewScope) && !noScope;
+            if (genNewScope) {
+                incRex(env.getLocalOffset());
+                env.addNewLevel();
+            }
             processFurther(head->getLeft(), valueNeeded);
             if (head->getRight())
                 c_Linker(head->getRight(), valueNeeded);
+
+            if (genNewScope) {
+                env.deleteLocal();
+                decRex(env.getLocalOffset());
+            }
         }
 
         void c_FuncDecl(ASTNode *head) {
-            StrContainer label = head->getLexeme().getString();
-
+            StrContainer *label = head->getLexeme().getString();
+            StrContainer *guard = StrContainer::New();
+            guard->cTor(label->begin());
+            guard->append("_guard");
             compiledString->sEndPrintf("\n; %s function definition (source:%zu:%zu)\n",
-                                       label.getStorage(), head->getLexeme().getLine(), head->getLexeme().getCol());
-            compiledString->sEndPrintf("%s:\n", label.getStorage());
-            env.addNewLevel();
+                                       label->getStorage(), head->getLexeme().getLine(), head->getLexeme().getCol());
 
+            compiledString->sEndPrintf("jmp %s\n"
+                                       "%s:\n", guard->getStorage(),
+                                       label->getStorage());
+
+            env.addNewLevel(true);
             if (head->getLeft()->getKind() != Kind_None) {
                 ASTNode *cur = head->getLeft();
                 while (cur != nullptr) {
                     Lexeme name = cur->getLeft()->getLexeme();
-                    env.def(name.getString(), ID_Var);
+                    env.def(name.getString());
                     cur = cur->getRight();
                 }
             }
 
-            processFurther(head->getRight());
-            compiledString->sEndPrintf("ret\n\n\n");
+            processFurther(head->getRight(), false, true);
+            compiledString->sEndPrintf("ret\n"
+                                       "%s:\n\n", guard->getStorage());
             env.deleteLocal();
         }
 
         void c_Identifier(ASTNode *head) {
-            StrContainer label = head->getLexeme().getString();
+            StrContainer *label = head->getLexeme().getString();
 
             Optional<IdCompiler> found = env.get(label);
             if (!found.hasValue()) {
-                // TODO: error
+                CompileError err {};
+                err.cTor("Identifier is not defined: ", head->getLexeme());
+                err.msg->sEndPrintf("%s", label->begin());
+                cErrors->push(err);
                 return;
             }
 
-            varSpecificOperation("push", found.unwrap());
+            varSpecificOperation("push", found.unwrap(), 0, head->getLexeme().getLine(), head->getLexeme().getCol());
         }
 
         void c_Number(ASTNode *head) {
@@ -127,9 +184,16 @@ namespace NGG {
                     compiledString->sEndPrintf("div ; %zu:%zu\n",
                                                head->getLexeme().getLine(), head->getLexeme().getCol());
                     break;
-                default: {
-                    // TODO: error
+                case Lex_Pow:
+                    compiledString->sEndPrintf("pow ; %zu:%zu\n",
+                                               head->getLexeme().getLine(), head->getLexeme().getCol());
                     break;
+                default: {
+                    CompileError err {};
+                    err.cTor("Unknown operation in c_MaOperator: ", head->getLexeme());
+                    err.msg->sEndPrintf("%s", lexemeTypeToString(type));
+                    cErrors->push(err);
+                    return;
                 }
             }
         }
@@ -140,36 +204,43 @@ namespace NGG {
             ASTNode *idNode = head->getRight();
             ASTNode *valNode = head->getLeft();
 
-            StrContainer name = idNode->getLexeme().getString();
+            StrContainer *name = idNode->getLexeme().getString();
             Optional<IdCompiler> found = env.get(name);
 
             if (!found.hasValue()) {
-                // TODO: error
+                CompileError err {};
+                err.cTor("Identifier was not declared", head->getLexeme());
+                err.msg->sEndPrintf("%s", head->getLexeme().getString()->begin());
+                cErrors->push(err);
                 return;
             }
 
             switch (type) {
                 case Lex_AdAssg:
                     processFurther(valNode, true);
-                    varSpecificOperation("push", found.unwrap());
+                    varSpecificOperation("push", found.unwrap(), 0, head->getLexeme().getLine(),
+                                         head->getLexeme().getCol());
                     compiledString->sEndPrintf("add ; Lex_AdAssg %zu:%zu\n",
                                                head->getLexeme().getLine(), head->getLexeme().getCol());
                     break;
                 case Lex_MiAssg:
-                    varSpecificOperation("push", found.unwrap());
+                    varSpecificOperation("push", found.unwrap(), 0, head->getLexeme().getLine(),
+                                         head->getLexeme().getCol());
                     processFurther(valNode, true);
                     compiledString->sEndPrintf("sub ; Lex_AdAssg %zu:%zu\n",
                                                head->getLexeme().getLine(), head->getLexeme().getCol());
                     break;
                 case Lex_MuAssg:
                     processFurther(valNode, true);
-                    varSpecificOperation("push", found.unwrap());
+                    varSpecificOperation("push", found.unwrap(), 0, head->getLexeme().getLine(),
+                                         head->getLexeme().getCol());
                     compiledString->sEndPrintf("mul ; Lex_AdAssg %zu:%zu\n",
                                                head->getLexeme().getLine(), head->getLexeme().getCol());
                     break;
                 case Lex_DiAssg:
                     processFurther(valNode, true);
-                    varSpecificOperation("push", found.unwrap());
+                    varSpecificOperation("push", found.unwrap(), 0,
+                                         head->getLexeme().getLine(), head->getLexeme().getCol());
                     compiledString->sEndPrintf("div ; Lex_AdAssg %zu:%zu\n",
                                                head->getLexeme().getLine(), head->getLexeme().getCol());
                     break;
@@ -177,23 +248,31 @@ namespace NGG {
                     processFurther(head->getRight(), true);
                 }
                 default: {
-                    // TODO: error
-                    break;
+                    CompileError err {};
+                    err.cTor("Unknown operation in c_AssignExpr: ", head->getLexeme());
+                    err.msg->sEndPrintf("%s", lexemeTypeToString(type));
+                    cErrors->push(err);
+                    return;
                 }
             }
-            varSpecificOperation("pop", found.unwrap());
+            varSpecificOperation("pop", found.unwrap(), 0, head->getLexeme().getLine(), head->getLexeme().getCol());
         }
 
         void c_VarDef(ASTNode *head) {
             auto type = head->getLexeme();
-            bool res = env.def(type.getString(), ID_Var);
+            bool res = env.def(type.getString());
             if (!res) {
-                // TODO: error
+                CompileError err {};
+                err.cTor("Can't redeclare variable: ", head->getLexeme());
+                err.msg->sEndPrintf("%s", head->getLexeme().getString()->begin());
+                cErrors->push(err);
+                return;
             }
             processFurther(head->getLeft(), true);
             Optional<IdCompiler> found = env.get(type.getString());
 
-            varSpecificOperation("pop", found.unwrap());
+            varSpecificOperation("pop", found.unwrap(), 0,
+                                 head->getLexeme().getLine(), head->getLexeme().getCol());
         }
 
         void c_MaUnOperator(ASTNode *head) {
@@ -226,7 +305,7 @@ namespace NGG {
                 }
             }
             incRex(env.getLocalOffset());
-            compiledString->sEndPrintf("call %s\n", head->getLexeme().getString().begin());
+            compiledString->sEndPrintf("call %s\n", head->getLexeme().getString()->begin());
             decRex(env.getLocalOffset());
             if (valueNeeded)
                 compiledString->sEndPrintf("push rax ; pushing return value\n");
@@ -257,15 +336,25 @@ namespace NGG {
                     compiledString->sEndPrintf("le ; <\n");
                     break;
                 default: {
-                    // TODO: error
+                    CompileError err {};
+                    err.cTor("Unknown operator in c_CmpOperator: ", head->getLexeme());
+                    err.msg->sEndPrintf("%s", lexemeTypeToString(type));
+                    cErrors->push(err);
+                    return;
                 }
             }
         }
 
         void c_ReturnStmt(ASTNode *head) {
-            processFurther(head->getLeft(), true);
-            compiledString->sEndPrintf("pop rax ; return value\n"
-                                       "ret\n");
+            if (head->getLeft()->getKind() != Kind_None) {
+                processFurther(head->getLeft(), true);
+                decRex(env.getFunctionOffset());
+                compiledString->sEndPrintf("pop rax ; return value\n"
+                                           "ret\n");
+            } else {
+                decRex(env.getFunctionOffset());
+                compiledString->sEndPrintf("ret\n");
+            }
         }
 
         void c_Print(ASTNode *head) {
@@ -275,7 +364,8 @@ namespace NGG {
         }
 
         void c_Input(ASTNode *head) {
-            compiledString->sEndPrintf("in ; input %zu:%zu \n", head->getLexeme().getLine(), head->getLexeme().getCol());
+            compiledString->sEndPrintf("in ; input %zu:%zu \n", head->getLexeme().getLine(),
+                                       head->getLexeme().getCol());
         }
 
         void c_IfStmt(ASTNode *head) {
@@ -297,8 +387,8 @@ namespace NGG {
                                            "je %s\n", continueLabel.begin());
             }
             processFurther(ifBranch);
-            compiledString->sEndPrintf("jmp %s\n", continueLabel.begin());
             if (elseBranch->getKind() != Kind_None) {
+                compiledString->sEndPrintf("jmp %s\n", continueLabel.begin());
                 compiledString->sEndPrintf("%s:\n", elseLabel.begin());
                 processFurther(elseBranch);
             }
@@ -307,12 +397,14 @@ namespace NGG {
             elseLabel.dTor();
         }
 
-        void processFurther(ASTNode *head, bool valueNeeded=false) {
+        void c_None(ASTNode *head) {}
+
+        void processFurther(ASTNode *head, bool valueNeeded = false, bool noScope = false) {
             if (head == nullptr)
                 return;
             switch (head->getKind()) {
                 case Kind_Linker:
-                    c_Linker(head, valueNeeded);
+                    c_Linker(head, valueNeeded, noScope);
                     break;
                 case Kind_FuncDecl:
                     c_FuncDecl(head);
@@ -356,13 +448,19 @@ namespace NGG {
                 case Kind_Input:
                     c_Input(head);
                     break;
+                case Kind_None:
+                    c_None(head);
+                    break;
                     /*
                     case Kind_WhileStmt:
                         c_WhileStmt(head);
                         break;
                     */
                 default: {
-                    printf("Undefined sequence: %s\n", ASTNodeKindToString(head->getKind()));
+                    CompileError err {};
+                    err.cTor("Undefined sequence: ", head->getLexeme());
+                    err.msg->sEndPrintf("%s", ASTNodeKindToString(head->getKind()));
+                    cErrors->push(err);
                     break;
                 }
             }
@@ -373,14 +471,19 @@ namespace NGG {
             tree.cTor();
             env.cTor();
             fileName = nullptr;
+            parsed = nullptr;
             compiledString = StrContainer::New();
-            compiledString->cTor(static_cast<char *>(calloc(1, sizeof(char))));
+            compiledString->cTor("");
+            cErrors = ClassicStack<CompileError>::New();
         }
 
         void dTor() {
             tree.dTor();
             env.dTor();
+            parsed->DestructList();
+            free(parsed);
             StrContainer::Delete(compiledString);
+            ClassicStack<CompileError>::Delete(cErrors);
         }
 
         static NGGCompiler *New() {
@@ -395,12 +498,10 @@ namespace NGG {
         }
 
         void compile() {
-            compiledString->sEndPrintf("mov rex 0\n"
-                                       "call giveYouUp\n"
-                                       "jmp end_label\n\n");
             processFurther(tree.getHead());
-            compiledString->sEndPrintf("end_label:\n"
-                                       "hlt\n");
+            compiledString->sEndPrintf("mov rex %d\n"
+                                       "call giveYouUp\n"
+                                       "hlt\n\n", env.getLocalOffset());
         }
 
         bool loadFile(const char *filePath) {
@@ -416,48 +517,78 @@ namespace NGG {
             content.readFromFile(sourceCode);
             fclose(sourceCode);
 
-            auto res = NGG::LexParser::parse(&content);
+            auto *res = NGG::LexParser::parse(&content);
 
             auto ASTParser = NGG::AST {};
             ASTParser.cTor();
 
             ASTParser.parse(res);
+
             this->tree = ASTParser;
+            this->parsed = res;
+            content.dTor();
             return true;
+        }
+
+        void printLexemes(const char *lexfileName) {
+            FILE *file = fopen(lexfileName, "w");
+            LexParser::dumpLexemes(*parsed, file);
+            fclose(file);
         }
 
         bool isParseSuccessful() {
             return !tree.hasError();
         }
 
-        void dumpErrorStack() {
-            tree.dumpErrorStack();
+        bool isCompileSuccessful() {
+            return cErrors->isEmpty();
+        }
+
+        void dumpCompileErrorStack(const char *inputFileName) {
+            for (unsigned i = 0; i < cErrors->getSize(); ++i) {
+                const CompileError &err = cErrors->get(i);
+                printf("%s:%zu:%zu: error: %s\n", inputFileName, err.line + 1, err.col, err.msg->begin());
+            }
+        }
+
+        void dumpErrorStack(const char *inputFileName) {
+            tree.dumpParseErrorStack(inputFileName);
         };
 
-        void dumpGraph(FILE *file) {
+        void dumpGraph() {
+            FILE *file = fopen("graph.gv", "wb");
             tree.dumpTree(file);
+            fclose(file);
+            system("dot -Tsvg graph.gv -o code.svg");
+            system("dot -Tpng graph.gv -o code.png && rm graph.gv");
         }
 
         StrContainer *getCompiledString() {
             return compiledString;
         }
 
-        void printErrors(){
-
-        }
-
-        void saveAsmSource(const char* fileName) {
-            StrContainer* asmCode = this->getCompiledString();
-            FILE* outFile = fopen(fileName, "wb");
-            fwrite(asmCode->getStorage(),1, asmCode->getLen(), outFile);
+        void saveAsmSource(const char *fileAsmName) {
+            StrContainer *asmCode = this->getCompiledString();
+            FILE *outFile = fopen(fileAsmName, "wb");
+            fwrite(asmCode->getStorage(), 1, asmCode->getLen(), outFile);
             fclose(outFile);
         }
 
-        void genBytecode(const char* fileInp, const char* fileOut){
-            char* buffer = nullptr;
-            asprintf(&buffer, "SPUAsm --lst listing.lst --verbose --input %s --output %s", fileInp, fileOut);
+        static void genBytecode(const char *fileInp, CLParams &params) {
+            char *buffer = nullptr;
+            asprintf(&buffer, "SPUAsm %s %s --input %s --output %s %s %s",
+                     params.lstFile ? "--lst" : "", params.lstFile ? params.lstFileName : "",
+                     fileInp,
+                     params.outputFileName,
+                     params.preprocessed ? "-E" : "",
+                     params.verbose ? "--verbose" : "");
             system(buffer);
             free(buffer);
+        }
+
+        void dumpTree() {
+            FILE* file = fopen("treestruct.txt", "w");
+            ASTLoader::dump(tree.getHead(), file);
         }
     };
 }

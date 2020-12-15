@@ -1,0 +1,42 @@
+
+; giveYouUp function definition (source:0:13)
+jmp giveYouUp_guard
+giveYouUp:
+call solveSquareEquation
+ret
+giveYouUp_guard:
+
+
+; solveSquareEquation function definition (source:4:14)
+jmp solveSquareEquation_guard
+solveSquareEquation:
+push 10
+pop [rex+0] ; identifier x
+; incrementing rex for 1
+inc rex; inc complete
+
+push [rex-1] ; identifier x
+out
+pop
+push 20
+pop [rex+0] ; identifier x
+push [rex+0] ; identifier x
+out
+pop
+; decrementing rex for 1
+dec rex; dec complete
+
+push [rex+0] ; identifier x
+push 5
+sub ; Lex_AdAssg 12:8
+pop [rex+0] ; identifier x
+push [rex+0] ; identifier x
+out
+pop
+ret
+solveSquareEquation_guard:
+
+mov rex 0
+call giveYouUp
+hlt
+

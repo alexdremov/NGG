@@ -1,0 +1,32 @@
+SPUAssembly v2.3.0r a.spus -> a.spub
+26    ->    30 | 5   | jmp <giveYouUp_guard>     |  f  b  0  0  0 
+x     ->     x | 0   | giveYouUp:                | 
+31    ->    35 | 5   | call <solveSquareEquation> | 19  b  0  0  0 
+36    ->    36 | 1   | ret                       | 1a 
+x     ->     x | 0   | giveYouUp_guard:          | 
+37    ->    41 | 5   | jmp <solveSquareEquation_guard> |  f 84  0  0  0 
+x     ->     x | 0   | solveSquareEquation:      | 
+42    ->    51 | 10  | push <10>                 |  0  1  0  0  0  0  0  0 24 40 
+52    ->    62 | 11  | pop <[rex+0]>             |  1  7  0  0  0  0  0  0  0  0  4 
+63    ->    65 | 3   | inc <rex>                 | 17  2  4 
+66    ->    76 | 11  | push <[rex-1]>            |  0  7  0  0  0  0  0  0 f0 bf  4 
+77    ->    78 | 2   | out                       |  e  0 
+79    ->    80 | 2   | pop                       |  1  0 
+81    ->    90 | 10  | push <20>                 |  0  1  0  0  0  0  0  0 34 40 
+91    ->   101 | 11  | pop <[rex+0]>             |  1  7  0  0  0  0  0  0  0  0  4 
+102   ->   112 | 11  | push <[rex+0]>            |  0  7  0  0  0  0  0  0  0  0  4 
+113   ->   114 | 2   | out                       |  e  0 
+115   ->   116 | 2   | pop                       |  1  0 
+117   ->   119 | 3   | dec <rex>                 | 18  2  4 
+120   ->   130 | 11  | push <[rex+0]>            |  0  7  0  0  0  0  0  0  0  0  4 
+131   ->   140 | 10  | push <5>                  |  0  1  0  0  0  0  0  0 14 40 
+141   ->   141 | 1   | sub                       |  6 
+142   ->   152 | 11  | pop <[rex+0]>             |  1  7  0  0  0  0  0  0  0  0  4 
+153   ->   163 | 11  | push <[rex+0]>            |  0  7  0  0  0  0  0  0  0  0  4 
+164   ->   165 | 2   | out                       |  e  0 
+166   ->   167 | 2   | pop                       |  1  0 
+168   ->   168 | 1   | ret                       | 1a 
+x     ->     x | 0   | solveSquareEquation_guard: | 
+169   ->   180 | 12  | mov <rex><0>              | 1b  2  4  1  0  0  0  0  0  0  0  0 
+181   ->   185 | 5   | call <giveYouUp>          | 19 6a ff ff ff 
+186   ->   186 | 1   | hlt                       |  d 

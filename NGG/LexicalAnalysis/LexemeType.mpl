@@ -32,6 +32,7 @@ LEXEME(Plus)
 LEXEME(Minus)
 LEXEME(Mul)
 LEXEME(Div)
+LEXEME(Pow)
 
 LEXEME(Identifier)
 LEXEME(Number)

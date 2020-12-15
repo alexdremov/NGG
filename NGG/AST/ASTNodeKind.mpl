@@ -1,4 +1,5 @@
 KIND(Linker)
+KIND(Link_NewScope)
 KIND(SourceRoot)
 KIND(FuncDecl)
 KIND(Input)

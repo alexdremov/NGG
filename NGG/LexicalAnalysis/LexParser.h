@@ -75,7 +75,7 @@ namespace NGG {
             retVal.cTor();
             skipInvis(ptr);
 
-            int size = 0;
+            int size =   0;
             int number = 0;
             int result = sscanf(ptr, "%d%n", &number, &size);
 
@@ -115,23 +115,23 @@ namespace NGG {
             skipInvis(ptr);
             char *initPtr = ptr;
 
-            StrContainer identifier {};
-            identifier.cTor();
+            auto* identifier = StrContainer::New();
+            identifier->cTor("");
 
             if (!isCharacter(*ptr))
                 return retVal;
-            identifier.append(*ptr);
+            identifier->append(*ptr);
             ptr++;
 
             while (*ptr != '\0') {
                 if (isCharacter(*ptr)) {
-                    identifier.append(*ptr);
+                    identifier->append(*ptr);
                     ptr++;
                 } else {
                     auto number = tryParseLex_NumberInt(ptr);
                     if (!number.hasValue())
                         break;
-                    identifier.sEndPrintf("%d", (int) number->getDouble());
+                    identifier->sEndPrintf("%d", (int) number->getDouble());
                 }
             }
 
@@ -159,6 +159,10 @@ namespace NGG {
 
         static Optional<NGG::Lexeme> tryParseLex_Comma(char *&ptr) {
             PARSE_SYMBOL(',', Lex_Comma)
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Pow(char *&ptr) {
+            PARSE_SYMBOL('^', Lex_Pow)
         };
 
         static Optional<NGG::Lexeme> tryParseLex_Eq(char *&ptr) {
@@ -262,13 +266,12 @@ namespace NGG {
         };
 
     public:
-        static SwiftyList<NGG::Lexeme> parse(StrContainer *content) {
-            SwiftyList<NGG::Lexeme> result{};
-            result.cTor(0, 0, nullptr, false);
+        static SwiftyList<NGG::Lexeme>* parse(StrContainer *content) {
+            auto* result = SwiftyList<NGG::Lexeme>::CreateNovel(0,0, nullptr, false);
 
             char *ptr = content->begin();
 
-            #define CHECK_SUCCESS if (parsed.hasValue()){result.pushBack(parsed.unwrap()); continue;}
+            #define CHECK_SUCCESS if (parsed.hasValue()){result->pushBack(parsed.unwrap()); continue;}
             #define TRY_PARSE(type) parsed = tryParse ## type(ptr); CHECK_SUCCESS
 
             for (; ptr < content->end();) {
@@ -286,14 +289,14 @@ namespace NGG {
             #undef TRY_PARSE
 
             char* start = content->begin();
-            for(size_t it = result.begin(); it != 0; it = result.nextIterator(it)) {
+            for(size_t it = result->begin(); it != 0; it = result->nextIterator(it)) {
                 size_t col = 0, line = 0;
 
                 Lexeme tmp{}; tmp.cTor();
-                result.get(it, &tmp);
+                result->get(it, &tmp);
                 getOffsets(tmp.getCodeOffset(), start, line, col);
                 tmp.setLineCol(line, col);
-                result.set(it, tmp);
+                result->set(it, tmp);
             }
 
             return result;
@@ -301,13 +304,18 @@ namespace NGG {
 
         static void dumpLexemes(SwiftyList<NGG::Lexeme> &list, FILE *output = stdout) {
             size_t pos = list.begin();
+            size_t curLine = 0;
             for (; pos != 0; list.nextIterator(&pos)) {
                 NGG::Lexeme cur {};
                 list.get(pos, &cur);
+                if (cur.getLine() > curLine){
+                    curLine = cur.getLine();
+                    fprintf(output, "\n");
+                }
 
                 fprintf(output, "%s", lexemeTypeToString(cur.getType()));
                 if (cur.isStringUsed()) {
-                    fprintf(output, "<%s>", cur.getString().begin());
+                    fprintf(output, "<%s>", cur.getString()->begin());
                 } else {
                     if (cur.getDouble() == 0) {
                         fprintf(output, "<0>");

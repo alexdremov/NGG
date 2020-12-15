@@ -1,0 +1,182 @@
+
+; giveYouUp function definition (source:0:13)
+jmp giveYouUp_guard
+giveYouUp:
+in ; input 1:26 
+pop [rex+0] ; preparing arg for func call
+in ; input 1:34 
+pop [rex+1] ; preparing arg for func call
+in ; input 1:42 
+pop [rex+2] ; preparing arg for func call
+call solveSquareEquation
+ret
+giveYouUp_guard:
+
+
+; solveSquareEquation function definition (source:4:14)
+jmp solveSquareEquation_guard
+solveSquareEquation:
+; processing if:5:6
+push [rex+0] ; identifier a
+push 0
+eq ; ==
+push 0
+je lbl_5_6_else__IAOLN
+; incrementing rex for 3
+push 3
+push rex
+add
+pop rex
+; inc complete
+
+; processing if:6:10
+push [rex-2] ; identifier b
+push 0
+eq ; ==
+push 0
+je lbl_6_10_else__XHBQE
+; processing if:7:14
+push [rex-1] ; identifier c
+push 0
+eq ; ==
+push 0
+je lbl_7_14_else__VDGIH
+push 1
+push 0
+div ; 8:28
+out
+pop
+jmp lbl_7_14_cont__PBVFQ
+lbl_7_14_else__VDGIH:
+push 0
+out
+pop
+lbl_7_14_cont__PBVFQ:
+jmp lbl_6_10_cont__AFMCD
+lbl_6_10_else__XHBQE:
+push 1
+out
+pop
+push [rex-1] ; identifier c
+push -1
+mul ; 14:22
+push [rex-2] ; identifier b
+div ; 14:25
+out
+pop
+lbl_6_10_cont__AFMCD:
+; decrementing rex for 3
+push rex
+push 3
+sub
+pop rex
+; dec complete
+
+jmp lbl_5_6_cont__HBRCK
+lbl_5_6_else__IAOLN:
+; incrementing rex for 3
+push 3
+push rex
+add
+pop rex
+; inc complete
+
+push [rex-2] ; identifier b
+push 2
+pow ; 17:25
+push 4
+push [rex-3] ; identifier a
+mul ; 17:33
+push [rex-1] ; identifier c
+mul ; 17:37
+sub ; 17:29
+pop [rex+0] ; identifier d
+; processing if:18:10
+push 0
+push [rex+0] ; identifier d
+eq ; ==
+push 0
+je lbl_18_10_else__JTNDV
+; incrementing rex for 1
+inc rex; inc complete
+
+push 1
+out
+pop
+push [rex-3] ; identifier b
+push -1
+mul ; 20:22
+push 2
+push [rex-4] ; identifier a
+mul ; 20:30
+div ; 20:25
+out
+pop
+; decrementing rex for 1
+dec rex; dec complete
+
+jmp lbl_18_10_cont__BCITC
+lbl_18_10_else__JTNDV:
+; incrementing rex for 1
+inc rex; inc complete
+
+; processing if:22:14
+push [rex-1] ; identifier d
+push 0
+gr ; >
+push 0
+je lbl_22_14_else__RUTSN
+push 2
+out
+pop
+push [rex-3] ; identifier b
+push -1
+mul ; 24:31
+push [rex-1] ; identifier d
+push 0.5
+pow ; 24:38
+add ; 24:34
+push 2
+push [rex-4] ; identifier a
+mul ; 24:50
+div ; 24:45
+out
+pop
+push [rex-3] ; identifier b
+push -1
+mul ; 25:31
+push [rex-1] ; identifier d
+push 0.5
+pow ; 25:38
+sub ; 25:34
+push 2
+push [rex-4] ; identifier a
+mul ; 25:50
+div ; 25:45
+out
+pop
+jmp lbl_22_14_cont__HIBAF
+lbl_22_14_else__RUTSN:
+push 0
+out
+pop
+lbl_22_14_cont__HIBAF:
+; decrementing rex for 1
+dec rex; dec complete
+
+lbl_18_10_cont__BCITC:
+; decrementing rex for 3
+push rex
+push 3
+sub
+pop rex
+; dec complete
+
+lbl_5_6_cont__HBRCK:
+ret
+solveSquareEquation_guard:
+
+mov rex 0
+call giveYouUp
+hlt
+

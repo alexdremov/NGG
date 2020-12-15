@@ -157,7 +157,7 @@ namespace NGG {
 
                 if (linksHead == nullptr) {
                     linksHead = ASTNode::New();
-                    linksHead->cTor(Kind_Linker, Kind_Statement);
+                    linksHead->cTor(Kind_Linker, Kind_Link_NewScope);
                     linkEnd = linksHead;
                 }
 
@@ -356,6 +356,7 @@ namespace NGG {
 
                 LEX_SET_IF_NONE(op, Lex_Mul)
                 else LEX_SET_IF_NONE(op, Lex_Div)
+                else LEX_SET_IF_NONE(op, Lex_Pow)
 
                 if (op != Lex_None) {
                     Optional<ASTNode *> secondValue = p_UnaryExpr(pos);
@@ -544,8 +545,7 @@ namespace NGG {
             Optional<ASTNode *> value = p_rValue(pos);
 
             if (!value.hasValue()) {
-                error(pos, "No value found after function return keyword");
-                return retValue;
+                value.cTor(getNoneNode());
             }
 
             if (!expectLexAndMove(pos, Lex_StEnd)) {
@@ -714,18 +714,23 @@ namespace NGG {
                         node->getLexeme().getDouble(), node->getLexeme().getLine(),  node->getLexeme().getCol());
             } else if (node->getKind() == Kind_Identifier) {
                 fprintf(file, "node%p[label=\"ID<%s>:%zu:%zu\" shape=oval fillcolor=aquamarine style=filled]\n", node,
-                        node->getLexeme().getString().begin(), node->getLexeme().getLine(),  node->getLexeme().getCol());
+                        node->getLexeme().getString()->begin(), node->getLexeme().getLine(),  node->getLexeme().getCol());
             } else {
                 if (node->getLexeme().isStringUsed())
                     fprintf(file, "node%p[label=\"%s<%s<%s>>:%zu:%zu\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
                             node,
                             ASTNodeKindToString(node->getKind()), lexemeTypeToString(node->getLexeme().getType()),
-                            node->getLexeme().getString().begin(), node->getLexeme().getLine(),
+                            node->getLexeme().getString()->begin(), node->getLexeme().getLine(),
                             node->getLexeme().getCol());
                 else if (node->getKind() == Kind_Linker)
+                    if (node->getLinkKind() != Kind_Link_NewScope)
                     fprintf(file, "node%p[label=\"%s\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
                             node,
                             ASTNodeKindToString(node->getKind()));
+                    else
+                        fprintf(file, "node%p[label=\"%s(ns)\" shape=invhouse fillcolor=yellow style=filled]\n",
+                                node,
+                                ASTNodeKindToString(node->getKind()));
                 else
                     fprintf(file, "node%p[label=\"%s<%s>:%zu:%zu\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
                             node,
@@ -737,15 +742,15 @@ namespace NGG {
 
 
             if (node->getLeft()) {
-                if (node->getLeft()->getKind() == Kind_Linker && node->getKind() == node->getLeft()->getKind())
-                    fprintf(file, "{rank=same; node%p; node%p}\n", node, node->getLeft());
+//                if (node->getLeft()->getKind() == Kind_Linker && node->getKind() == node->getLeft()->getKind())
+//                    fprintf(file, "{rank=same; node%p; node%p}\n", node, node->getLeft());
 
                 fprintf(file, "node%p->node%p[color=green label=L]\n", node, node->getLeft());
                 recursiveDump(file, node->getLeft());
             }
             if (node->getRight()) {
-                if (node->getRight()->getKind() == Kind_Linker && node->getKind() == node->getRight()->getKind())
-                    fprintf(file, "{rank=same; node%p; node%p}\n", node, node->getRight());
+//                if (node->getRight()->getKind() == Kind_Linker && node->getKind() == node->getRight()->getKind())
+//                    fprintf(file, "{rank=same; node%p; node%p}\n", node, node->getRight());
                 fprintf(file, "node%p->node%p[color=red label=R]\n", node, node->getRight());
                 recursiveDump(file, node->getRight());
             }
@@ -756,6 +761,8 @@ namespace NGG {
         }
 
         void dTor() {
+            if (head)
+                ASTNode::Delete(head);
             this->errorStack.dTor();
         }
 
@@ -770,11 +777,11 @@ namespace NGG {
             free(ob);
         }
 
-        void parse(SwiftyList<Lexeme> &input) {
+        void parse(SwiftyList<Lexeme>*input) {
             ParsePosition pos {};
-            pos.cTor(&input);
+            pos.cTor(input);
 
-            if (input.isEmpty()) {
+            if (input->isEmpty()) {
                 head = getNoneNode();
                 return;
             }
@@ -825,14 +832,17 @@ namespace NGG {
             fprintf(file, "}\n");
         }
 
-        void dumpErrorStack() {
+        void dumpParseErrorStack(const char* inputFileName) {
             ASTError *storage = errorStack.getStorage();
             if (errorStack.isEmpty()){
                 printf("No errors detected\n");
             } else {
                 printf("\n");
                 for (int i = 0; i < errorStack.getSize(); i++) {
-                    printf("%s at %s:%zu:%zu\n", storage[i].errorMsg, lexemeTypeToString(storage[i].errorIt.getType()),
+                    printf("%s:%zu:%zu: error: %s at %s:%zu:%zu\n", inputFileName,
+                           storage[i].errorIt.getLine() + 1, storage[i].errorIt.getCol(),
+                           storage[i].errorMsg,
+                           lexemeTypeToString(storage[i].errorIt.getType()),
                            storage[i].errorIt.getLine() + 1, storage[i].errorIt.getCol());
                 }
             }

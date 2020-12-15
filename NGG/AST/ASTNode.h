@@ -41,6 +41,8 @@ namespace NGG {
         }
 
         void dTor() {
+            if (kind != Kind_Linker)
+                lexeme.dTor();
             if (left)
                 Delete(left);
             if (right)

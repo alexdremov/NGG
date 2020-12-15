@@ -15,19 +15,20 @@ namespace NGG {
         size_t     col;
         size_t     line;
         char*      codeOffset;
-        union {
-            StrContainer sContent;
-            double vContent;
-        };
+        StrContainer* sContent;
+        double vContent;
+
     public:
         void cTor(){
             type = Lex_None;
             col = 0;
             line = 0;
             stringUsed = false;
+            vContent = 0;
+            sContent = nullptr;
         }
 
-        void cTor(LexemeType lexemeType, StrContainer content, char* offset= nullptr){
+        void cTor(LexemeType lexemeType, StrContainer* content, char* offset= nullptr){
             type = lexemeType;
             sContent = content;
             stringUsed = true;
@@ -48,8 +49,8 @@ namespace NGG {
         }
 
         void dTor(){
-            if (stringUsed)
-                sContent.dTor();
+            if (sContent)
+                StrContainer::Delete(sContent);
         }
 
         static Lexeme* New(){
@@ -87,7 +88,7 @@ namespace NGG {
             return vContent;
         }
 
-        [[nodiscard]] StrContainer getString() const{
+        [[nodiscard]] StrContainer* getString() const{
             return sContent;
         }
 

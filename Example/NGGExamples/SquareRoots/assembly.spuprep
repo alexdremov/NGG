@@ -1,0 +1,150 @@
+jmp giveYouUp_guard
+giveYouUp:
+in
+pop [rex+0]
+in
+pop [rex+1]
+in
+pop [rex+2]
+call solveSquareEquation
+ret
+giveYouUp_guard:
+jmp solveSquareEquation_guard
+solveSquareEquation:
+push [rex+0]
+push 0
+eq
+push 0
+je lbl_5_6_else__IAOLN
+push 3
+push rex
+add
+pop rex
+push [rex-2]
+push 0
+eq
+push 0
+je lbl_6_10_else__XHBQE
+push [rex-1]
+push 0
+eq
+push 0
+je lbl_7_14_else__VDGIH
+push 1
+push 0
+div
+out
+pop
+jmp lbl_7_14_cont__PBVFQ
+lbl_7_14_else__VDGIH:
+push 0
+out
+pop
+lbl_7_14_cont__PBVFQ:
+jmp lbl_6_10_cont__AFMCD
+lbl_6_10_else__XHBQE:
+push 1
+out
+pop
+push [rex-1]
+push -1
+mul
+push [rex-2]
+div
+out
+pop
+lbl_6_10_cont__AFMCD:
+push rex
+push 3
+sub
+pop rex
+jmp lbl_5_6_cont__HBRCK
+lbl_5_6_else__IAOLN:
+push 3
+push rex
+add
+pop rex
+push [rex-2]
+push 2
+pow
+push 4
+push [rex-3]
+mul
+push [rex-1]
+mul
+sub
+pop [rex+0]
+push 0
+push [rex+0]
+eq
+push 0
+je lbl_18_10_else__JTNDV
+inc rex
+push 1
+out
+pop
+push [rex-3]
+push -1
+mul
+push 2
+push [rex-4]
+mul
+div
+out
+pop
+dec rex
+jmp lbl_18_10_cont__BCITC
+lbl_18_10_else__JTNDV:
+inc rex
+push [rex-1]
+push 0
+gr
+push 0
+je lbl_22_14_else__RUTSN
+push 2
+out
+pop
+push [rex-3]
+push -1
+mul
+push [rex-1]
+push 0.5
+pow
+add
+push 2
+push [rex-4]
+mul
+div
+out
+pop
+push [rex-3]
+push -1
+mul
+push [rex-1]
+push 0.5
+pow
+sub
+push 2
+push [rex-4]
+mul
+div
+out
+pop
+jmp lbl_22_14_cont__HIBAF
+lbl_22_14_else__RUTSN:
+push 0
+out
+pop
+lbl_22_14_cont__HIBAF:
+dec rex
+lbl_18_10_cont__BCITC:
+push rex
+push 3
+sub
+pop rex
+lbl_5_6_cont__HBRCK:
+ret
+solveSquareEquation_guard:
+mov rex 0
+call giveYouUp
+hlt

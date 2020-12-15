@@ -1,0 +1,64 @@
+
+; fact function definition (source:0:13)
+jmp fact_guard
+fact:
+; processing if:1:6
+push [rex+0] ; identifier num
+push 1
+leq ; <=
+push 0
+je lbl_1_6_else__IAOLN
+; incrementing rex for 1
+inc rex; inc complete
+
+push 1
+; decrementing rex for 1
+dec rex; dec complete
+
+pop rax ; return value
+ret
+; decrementing rex for 1
+dec rex; dec complete
+
+jmp lbl_1_6_cont__HBRCK
+lbl_1_6_else__IAOLN:
+; incrementing rex for 1
+inc rex; inc complete
+
+push [rex-1] ; identifier num
+push 1
+sub ; 4:48
+pop [rex+0] ; preparing arg for func call
+call fact
+push rax ; pushing return value
+push [rex-1] ; identifier num
+mul ; 4:53
+; decrementing rex for 1
+dec rex; dec complete
+
+pop rax ; return value
+ret
+; decrementing rex for 1
+dec rex; dec complete
+
+lbl_1_6_cont__HBRCK:
+ret
+fact_guard:
+
+
+; giveYouUp function definition (source:8:14)
+jmp giveYouUp_guard
+giveYouUp:
+in ; input 9:19 
+pop [rex+0] ; preparing arg for func call
+call fact
+push rax ; pushing return value
+out
+pop
+ret
+giveYouUp_guard:
+
+mov rex 0
+call giveYouUp
+hlt
+

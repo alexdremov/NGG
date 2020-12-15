@@ -1,0 +1,403 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXFileReference section */
+		A0FB47642584ACE800807B06 /* lexemes.lex */ = {isa = PBXFileReference; lastKnownFileType = text; path = lexemes.lex; sourceTree = "<group>"; };
+		A0FB47662584ACE800807B06 /* assembly.spuprep */ = {isa = PBXFileReference; lastKnownFileType = text; path = assembly.spuprep; sourceTree = "<group>"; };
+		A0FB47672584ACE800807B06 /* code.svg */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = code.svg; sourceTree = "<group>"; };
+		A0FB47682584ACE800807B06 /* a.spus */ = {isa = PBXFileReference; lastKnownFileType = text; path = a.spus; sourceTree = "<group>"; };
+		A0FB47692584ACE800807B06 /* factorial.ngg */ = {isa = PBXFileReference; lastKnownFileType = text; path = factorial.ngg; sourceTree = "<group>"; };
+		A0FB476A2584ACE800807B06 /* listing.lst */ = {isa = PBXFileReference; lastKnownFileType = text; path = listing.lst; sourceTree = "<group>"; };
+		A0FB477825880A6700807B06 /* square.ngg */ = {isa = PBXFileReference; lastKnownFileType = text; path = square.ngg; sourceTree = "<group>"; };
+		A0FB477925880B2F00807B06 /* code.svg */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = code.svg; sourceTree = "<group>"; };
+		A0FB477A25880B2F00807B06 /* lexemes.lex */ = {isa = PBXFileReference; lastKnownFileType = text; path = lexemes.lex; sourceTree = "<group>"; };
+		A0FB477B25880B2F00807B06 /* listing.lst */ = {isa = PBXFileReference; lastKnownFileType = text; path = listing.lst; sourceTree = "<group>"; };
+		A0FB477C25880B2F00807B06 /* assembly.spuprep */ = {isa = PBXFileReference; lastKnownFileType = text; path = assembly.spuprep; sourceTree = "<group>"; };
+		A0FB477D25880B2F00807B06 /* a.spub */ = {isa = PBXFileReference; lastKnownFileType = file; path = a.spub; sourceTree = "<group>"; };
+		A0FB477E25880B2F00807B06 /* a.spus */ = {isa = PBXFileReference; lastKnownFileType = text; path = a.spus; sourceTree = "<group>"; };
+		A0FB477F2588337600807B06 /* code.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = code.png; sourceTree = "<group>"; };
+		A0FB47812588FE0F00807B06 /* scope.ngg */ = {isa = PBXFileReference; lastKnownFileType = text; path = scope.ngg; sourceTree = "<group>"; };
+		A0FB47862588FF2600807B06 /* code.svg */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = code.svg; sourceTree = "<group>"; };
+		A0FB47872588FF2600807B06 /* a.spus */ = {isa = PBXFileReference; lastKnownFileType = text; path = a.spus; sourceTree = "<group>"; };
+		A0FB47882588FF2600807B06 /* assembly.spuprep */ = {isa = PBXFileReference; lastKnownFileType = text; path = assembly.spuprep; sourceTree = "<group>"; };
+		A0FB47892588FF2600807B06 /* a.spub */ = {isa = PBXFileReference; lastKnownFileType = file; path = a.spub; sourceTree = "<group>"; };
+		A0FB478A2588FF2600807B06 /* lexemes.lex */ = {isa = PBXFileReference; lastKnownFileType = text; path = lexemes.lex; sourceTree = "<group>"; };
+		A0FB478B2588FF2600807B06 /* code.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = code.png; sourceTree = "<group>"; };
+		A0FB478C2588FF2700807B06 /* listing.lst */ = {isa = PBXFileReference; lastKnownFileType = text; path = listing.lst; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		A0FB47562583F8A100807B06 = {
+			isa = PBXGroup;
+			children = (
+				A0FB47802588FE0F00807B06 /* Scope */,
+				A0FB47732588099200807B06 /* SquareRoots */,
+				A0FB47612583F8E000807B06 /* Fact */,
+			);
+			sourceTree = "<group>";
+		};
+		A0FB47612583F8E000807B06 /* Fact */ = {
+			isa = PBXGroup;
+			children = (
+				A0FB47692584ACE800807B06 /* factorial.ngg */,
+				A0FB47682584ACE800807B06 /* a.spus */,
+				A0FB477F2588337600807B06 /* code.png */,
+				A0FB47642584ACE800807B06 /* lexemes.lex */,
+				A0FB476A2584ACE800807B06 /* listing.lst */,
+				A0FB47672584ACE800807B06 /* code.svg */,
+				A0FB47662584ACE800807B06 /* assembly.spuprep */,
+			);
+			path = Fact;
+			sourceTree = "<group>";
+		};
+		A0FB47732588099200807B06 /* SquareRoots */ = {
+			isa = PBXGroup;
+			children = (
+				A0FB477D25880B2F00807B06 /* a.spub */,
+				A0FB477E25880B2F00807B06 /* a.spus */,
+				A0FB477C25880B2F00807B06 /* assembly.spuprep */,
+				A0FB477925880B2F00807B06 /* code.svg */,
+				A0FB477A25880B2F00807B06 /* lexemes.lex */,
+				A0FB477B25880B2F00807B06 /* listing.lst */,
+				A0FB477825880A6700807B06 /* square.ngg */,
+			);
+			path = SquareRoots;
+			sourceTree = "<group>";
+		};
+		A0FB47802588FE0F00807B06 /* Scope */ = {
+			isa = PBXGroup;
+			children = (
+				A0FB47892588FF2600807B06 /* a.spub */,
+				A0FB47872588FF2600807B06 /* a.spus */,
+				A0FB47882588FF2600807B06 /* assembly.spuprep */,
+				A0FB478B2588FF2600807B06 /* code.png */,
+				A0FB47862588FF2600807B06 /* code.svg */,
+				A0FB478A2588FF2600807B06 /* lexemes.lex */,
+				A0FB478C2588FF2700807B06 /* listing.lst */,
+				A0FB47812588FE0F00807B06 /* scope.ngg */,
+			);
+			path = Scope;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		A0FB475B2583F8A100807B06 /* Fact */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "--input factorial.ngg --output a.spub --lst listing.lst -o -E -g --lex lexemes.lex";
+			buildConfigurationList = A0FB475E2583F8A100807B06 /* Build configuration list for PBXLegacyTarget "Fact" */;
+			buildPhases = (
+			);
+			buildToolPath = "/Users/aleksandrdremov/Desktop/Обучение/МФТИ/ФПМИ/BigProjects/SpecCode/build/ngg";
+			buildWorkingDirectory = "/Users/aleksandrdremov/Desktop/Обучение/МФТИ/ФПМИ/BigProjects/SpecCode/Example/NGGExamples/Fact";
+			dependencies = (
+			);
+			name = Fact;
+			passBuildSettingsInEnvironment = 0;
+			productName = NGGExamples;
+		};
+		A0FB47742588099E00807B06 /* SquareRoots */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "--input square.ngg --output a.spub --lst listing.lst -o -E -g --lex lexemes.lex";
+			buildConfigurationList = A0FB47752588099E00807B06 /* Build configuration list for PBXLegacyTarget "SquareRoots" */;
+			buildPhases = (
+			);
+			buildToolPath = "/Users/aleksandrdremov/Desktop/Обучение/МФТИ/ФПМИ/BigProjects/SpecCode/build/ngg";
+			buildWorkingDirectory = "/Users/aleksandrdremov/Desktop/Обучение/МФТИ/ФПМИ/BigProjects/SpecCode/Example/NGGExamples/SquareRoots";
+			dependencies = (
+			);
+			name = SquareRoots;
+			passBuildSettingsInEnvironment = 0;
+			productName = NGGExamples;
+		};
+		A0FB47822588FE8C00807B06 /* Scope */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "--input scope.ngg --output a.spub --lst listing.lst -o -E -g --lex lexemes.lex";
+			buildConfigurationList = A0FB47832588FE8C00807B06 /* Build configuration list for PBXLegacyTarget "Scope" */;
+			buildPhases = (
+			);
+			buildToolPath = "/Users/aleksandrdremov/Desktop/Обучение/МФТИ/ФПМИ/BigProjects/SpecCode/build/ngg";
+			buildWorkingDirectory = "/Users/aleksandrdremov/Desktop/Обучение/МФТИ/ФПМИ/BigProjects/SpecCode/Example/NGGExamples/Scope";
+			dependencies = (
+			);
+			name = Scope;
+			passBuildSettingsInEnvironment = 0;
+			productName = NGGExamples;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		A0FB47572583F8A100807B06 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1200;
+				TargetAttributes = {
+					A0FB475B2583F8A100807B06 = {
+						CreatedOnToolsVersion = 12.0;
+					};
+				};
+			};
+			buildConfigurationList = A0FB475A2583F8A100807B06 /* Build configuration list for PBXProject "NGGExamples" */;
+			compatibilityVersion = "Xcode 12.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A0FB47562583F8A100807B06;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A0FB475B2583F8A100807B06 /* Fact */,
+				A0FB47742588099E00807B06 /* SquareRoots */,
+				A0FB47822588FE8C00807B06 /* Scope */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		A0FB475C2583F8A100807B06 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				BUILT_PRODUCTS_DIR = kl;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+			};
+			name = Debug;
+		};
+		A0FB475D2583F8A100807B06 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				BUILT_PRODUCTS_DIR = kl;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+			};
+			name = Release;
+		};
+		A0FB475F2583F8A100807B06 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILT_PRODUCTS_DIR = "ns,";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 7D49J2XMDA;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A0FB47602583F8A100807B06 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILT_PRODUCTS_DIR = "ns,";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 7D49J2XMDA;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		A0FB47762588099E00807B06 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILT_PRODUCTS_DIR = "ns,";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 7D49J2XMDA;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A0FB47772588099E00807B06 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILT_PRODUCTS_DIR = "ns,";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 7D49J2XMDA;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		A0FB47842588FE8C00807B06 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILT_PRODUCTS_DIR = "ns,";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 7D49J2XMDA;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A0FB47852588FE8C00807B06 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILT_PRODUCTS_DIR = "ns,";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 7D49J2XMDA;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A0FB475A2583F8A100807B06 /* Build configuration list for PBXProject "NGGExamples" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0FB475C2583F8A100807B06 /* Debug */,
+				A0FB475D2583F8A100807B06 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A0FB475E2583F8A100807B06 /* Build configuration list for PBXLegacyTarget "Fact" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0FB475F2583F8A100807B06 /* Debug */,
+				A0FB47602583F8A100807B06 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A0FB47752588099E00807B06 /* Build configuration list for PBXLegacyTarget "SquareRoots" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0FB47762588099E00807B06 /* Debug */,
+				A0FB47772588099E00807B06 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A0FB47832588FE8C00807B06 /* Build configuration list for PBXLegacyTarget "Scope" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0FB47842588FE8C00807B06 /* Debug */,
+				A0FB47852588FE8C00807B06 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A0FB47572583F8A100807B06 /* Project object */;
+}

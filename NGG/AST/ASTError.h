@@ -11,6 +11,10 @@ namespace NGG {
     struct ASTError {
         Lexeme      errorIt;
         const char *errorMsg;
+
+        void dTor(){
+
+        }
     };
 }
 

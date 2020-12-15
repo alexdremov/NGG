@@ -45,7 +45,7 @@ public:
     void dTor(){
         if (storage) {
             free(storage);
-            storage = reinterpret_cast<char *>(0xBADF);
+            storage = nullptr;
         }
     }
 
@@ -80,6 +80,15 @@ public:
         reallocate(5);
         storage[len++] = symbol;
         storage[len] = '\0';
+    }
+
+    void append(const char* str) {
+        size_t lenAp= strlen(str);
+        reallocate(strlen(str) + 1);
+        strcpy(storage + len, str);
+        len += lenAp;
+        storage[len] = '\0';
+        updateLen();
     }
 
     void append(StrContainer* str) {
