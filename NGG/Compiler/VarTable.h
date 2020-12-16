@@ -41,7 +41,7 @@ namespace NGG {
 
     class VarTable {
         ClassicStack<SwiftyList<IdCompiler>> storage;
-        ClassicStack<size_t> functionScope;
+        ClassicStack<size_t>                 functionScope;
     public:
         Optional<IdCompiler> get(StrContainer *id) {
             Optional<IdCompiler> retValue {};

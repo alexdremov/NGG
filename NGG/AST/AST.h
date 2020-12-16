@@ -20,7 +20,7 @@ if (expectLexAndMove(pos, lex) && storage == Lex_None) { \
 
 namespace NGG {
     class AST {
-        ASTNode                *head;
+        ASTNode *head;
         ClassicStack<ASTError> errorStack;
 
         void error(ParsePosition &pos, const char *msg) {
@@ -196,10 +196,12 @@ namespace NGG {
             if (!content.hasValue())
                 content = p_AssignExpr(pos);
             if (!content.hasValue())
+                content = p_Setpix(pos);
+            if (!content.hasValue())
                 content = p_FuncCall(pos);
 
             if (content.hasValue()) {
-                if (!expectLexAndMove(pos, Lex_StEnd)){
+                if (!expectLexAndMove(pos, Lex_StEnd)) {
                     pos.restore(checkpoint);
                     return retValue;
                 }
@@ -243,6 +245,30 @@ namespace NGG {
             } else {
                 node->setLeft(getNoneNode());
             }
+            retValue.cTor(node);
+            return retValue;
+        }
+
+        Optional<ASTNode *> p_Setpix(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            if (!expectLexAndMove(pos, Lex_Setpix))
+                return retValue;
+
+            Optional<ASTNode *> x = p_rValue(pos);
+            Optional<ASTNode *> y = p_rValue(pos);
+            Optional<ASTNode *> val = p_rValue(pos);
+
+            if (!(x.hasValue() && y.hasValue() && val.hasValue()))
+                return retValue;
+
+            auto *node = ASTNode::New();
+            auto *coordsNode = ASTNode::New();
+
+            coordsNode->cTor(Kind_Linker, getNoneLexeme(), x.unwrap(), y.unwrap());
+            node->cTor(Kind_Setpix, getNoneLexeme(), coordsNode, val.unwrap());
+
             retValue.cTor(node);
             return retValue;
         }
@@ -411,12 +437,63 @@ namespace NGG {
             Optional<ASTNode *> retValue {};
             retValue.cTor();
 
-            if (expectLexAndMove(pos, Lex_Input)){
+            if (expectLexAndMove(pos, Lex_Input)) {
                 auto *node = ASTNode::New();
                 node->cTor(Kind_Input, getNoneLexeme());
                 retValue.cTor(node);
                 return retValue;
             }
+            return retValue;
+        }
+
+        Optional<ASTNode *> p_Sin(ParsePosition &pos) {
+            return commonBasicFunction(pos, Lex_Sin);
+        }
+
+        Optional<ASTNode *> p_Cos(ParsePosition &pos) {
+            return commonBasicFunction(pos, Lex_Cos);
+        }
+
+        Optional<ASTNode *> p_Tan(ParsePosition &pos) {
+            return commonBasicFunction(pos, Lex_Tan);
+        }
+
+        Optional<ASTNode *> p_Exp(ParsePosition &pos) {
+            return commonBasicFunction(pos, Lex_Exp);
+        }
+
+        Optional<ASTNode *> p_Sqrt(ParsePosition &pos) {
+            return commonBasicFunction(pos, Lex_Sqrt);
+        }
+
+        Optional<ASTNode *> p_Abs(ParsePosition &pos) {
+            return commonBasicFunction(pos, Lex_Abs);
+        }
+
+        Optional<ASTNode *> p_BasicFunc(ParsePosition &pos) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            Optional<ASTNode *> tryParse = p_Sin(pos);
+            if (tryParse.hasValue()) return tryParse;
+
+            tryParse = p_Cos(pos);
+            if (tryParse.hasValue()) return tryParse;
+
+            tryParse = p_Tan(pos);
+            if (tryParse.hasValue()) return tryParse;
+
+            tryParse = p_Sqrt(pos);
+            if (tryParse.hasValue()) return tryParse;
+
+            tryParse = p_Abs(pos);
+            if (tryParse.hasValue()) return tryParse;
+
+            tryParse = p_Input(pos);
+            if (tryParse.hasValue()) return tryParse;
+
+            tryParse = p_Exp(pos);
+            if (tryParse.hasValue()) return tryParse;
             return retValue;
         }
 
@@ -437,14 +514,15 @@ namespace NGG {
 
                 retValue.cTor(value.unwrap());
                 return retValue;
-            } else if (expectLex(pos, Lex_Input)) {
-                Lexeme lex = pos.getMove();
+            }
 
-                auto *node = ASTNode::New();
-                node->cTor(Kind_Input, lex);
-                retValue.cTor(node);
+            Optional<ASTNode *> basicFunction = p_BasicFunc(pos);
+            if (basicFunction.hasValue()) {
+                retValue.cTor(basicFunction.unwrap());
                 return retValue;
-            } else if (expectLex(pos, Lex_Number)) {
+            }
+
+            if (expectLex(pos, Lex_Number)) {
                 Lexeme num = pos.getMove();
 
                 auto *node = ASTNode::New();
@@ -669,10 +747,45 @@ namespace NGG {
             return retValue;
         }
 
+        Optional<ASTNode *> commonBasicFunction(ParsePosition &pos, LexemeType type) {
+            Optional<ASTNode *> retValue {};
+            retValue.cTor();
+
+            Lexeme lex = pos.get();
+            if (!expectLexAndMove(pos, type)) {
+                return retValue;
+            }
+            if (!expectLexAndMove(pos, Lex_LPA)) {
+                error(pos, "No open parenthesis in basic function call");
+                return retValue;
+
+            }
+
+            Optional<ASTNode *> value = p_rValue(pos);
+            if (!value.hasValue()) {
+
+                error(pos, "No vaue found after basic function");
+                return retValue;
+
+            }
+            if (!expectLexAndMove(pos, Lex_RPA)) {
+
+                error(pos, "No close parenthesis in basic function call");
+                return retValue;
+
+            }
+
+            ASTNode *node = ASTNode::New();
+            node->cTor(Kind_BasicFunction, lex, value.unwrap(), nullptr);
+            retValue.cTor(node);
+            return retValue;
+        }
+
         Optional<ASTNode *> p_WhileStmt(ParsePosition &pos) {
             Optional<ASTNode *> retValue {};
             retValue.cTor();
 
+            Lexeme lex = pos.get();
             if (!expectLexAndMove(pos, Lex_While))
                 return retValue;
 
@@ -683,7 +796,7 @@ namespace NGG {
 
             Optional<ASTNode *> cond = p_rValue(pos);
             if (!cond.hasValue()) {
-                error(pos, "Invalid if condition");
+                error(pos, "Invalid while condition");
                 return retValue;
             }
 
@@ -695,12 +808,12 @@ namespace NGG {
             Optional<ASTNode *> exec = p_BlockStmt(pos);
 
             if (!exec.hasValue()) {
-                error(pos, "No blovk statement after while");
+                error(pos, "No block statement after while");
                 return retValue;
             }
 
             auto *node = ASTNode::New();
-            node->cTor(Kind_WhileStmt, getNoneLexeme(), cond.unwrap(), exec.unwrap());
+            node->cTor(Kind_WhileStmt, lex, cond.unwrap(), exec.unwrap());
             retValue.cTor(node);
             return retValue;
         }
@@ -711,28 +824,31 @@ namespace NGG {
 
             if (node->getKind() == Kind_Number) {
                 fprintf(file, "node%p[label=\"Number<%lg>:%zu:%zu\" shape=oval fillcolor=pink style=filled]\n", node,
-                        node->getLexeme().getDouble(), node->getLexeme().getLine(),  node->getLexeme().getCol());
+                        node->getLexeme().getDouble(), node->getLexeme().getLine(), node->getLexeme().getCol());
             } else if (node->getKind() == Kind_Identifier) {
                 fprintf(file, "node%p[label=\"ID<%s>:%zu:%zu\" shape=oval fillcolor=aquamarine style=filled]\n", node,
-                        node->getLexeme().getString()->begin(), node->getLexeme().getLine(),  node->getLexeme().getCol());
+                        node->getLexeme().getString()->begin(), node->getLexeme().getLine(),
+                        node->getLexeme().getCol());
             } else {
                 if (node->getLexeme().isStringUsed())
-                    fprintf(file, "node%p[label=\"%s<%s<%s>>:%zu:%zu\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
+                    fprintf(file,
+                            "node%p[label=\"%s<%s<%s>>:%zu:%zu\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
                             node,
                             ASTNodeKindToString(node->getKind()), lexemeTypeToString(node->getLexeme().getType()),
                             node->getLexeme().getString()->begin(), node->getLexeme().getLine(),
                             node->getLexeme().getCol());
                 else if (node->getKind() == Kind_Linker)
                     if (node->getLinkKind() != Kind_Link_NewScope)
-                    fprintf(file, "node%p[label=\"%s\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
-                            node,
-                            ASTNodeKindToString(node->getKind()));
+                        fprintf(file, "node%p[label=\"%s\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
+                                node,
+                                ASTNodeKindToString(node->getKind()));
                     else
                         fprintf(file, "node%p[label=\"%s(ns)\" shape=invhouse fillcolor=yellow style=filled]\n",
                                 node,
                                 ASTNodeKindToString(node->getKind()));
                 else
-                    fprintf(file, "node%p[label=\"%s<%s>:%zu:%zu\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
+                    fprintf(file,
+                            "node%p[label=\"%s<%s>:%zu:%zu\" shape=invhouse fillcolor=darkseagreen1 style=filled]\n",
                             node,
                             ASTNodeKindToString(node->getKind()), lexemeTypeToString(node->getLexeme().getType()),
                             node->getLexeme().getLine(),
@@ -755,6 +871,7 @@ namespace NGG {
                 recursiveDump(file, node->getRight());
             }
         }
+
     public:
         void cTor() {
             this->errorStack.cTor(0);
@@ -777,7 +894,7 @@ namespace NGG {
             free(ob);
         }
 
-        void parse(SwiftyList<Lexeme>*input) {
+        void parse(SwiftyList<Lexeme> *input) {
             ParsePosition pos {};
             pos.cTor(input);
 
@@ -802,7 +919,7 @@ namespace NGG {
             linkEnd->setLeft(res.unwrap());
 
             while (!pos.isEnded()) {
-                if (pos.get().getType() == Lex_None){
+                if (pos.get().getType() == Lex_None) {
                     ++pos;
                     continue;
                 }
@@ -832,9 +949,9 @@ namespace NGG {
             fprintf(file, "}\n");
         }
 
-        void dumpParseErrorStack(const char* inputFileName) {
+        void dumpParseErrorStack(const char *inputFileName) {
             ASTError *storage = errorStack.getStorage();
-            if (errorStack.isEmpty()){
+            if (errorStack.isEmpty()) {
                 printf("No errors detected\n");
             } else {
                 printf("\n");
@@ -848,15 +965,15 @@ namespace NGG {
             }
         }
 
-        ClassicStack<ASTError>& getErrorStack() {
+        ClassicStack<ASTError> &getErrorStack() {
             return errorStack;
         };
 
-        [[nodiscard]] bool hasError() const{
+        [[nodiscard]] bool hasError() const {
             return !errorStack.isEmpty();
         }
 
-        [[nodiscard]] ASTNode * getHead() const{
+        [[nodiscard]] ASTNode *getHead() const {
             return head;
         }
     };

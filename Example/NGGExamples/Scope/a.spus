@@ -1,42 +1,157 @@
+push 3.14159
+pop [0] ; identifier pi
 
-; giveYouUp function definition (source:0:13)
+; giveYouUp function definition (source:2:14)
 jmp giveYouUp_guard
 giveYouUp:
-call solveSquareEquation
+push 20
+pop [rex+0] ; preparing arg for func call
+push 20
+pop [rex+1] ; preparing arg for func call
+push 6
+pop [rex+2] ; preparing arg for func call
+call drawCircle
+push 20
+pop [rex+0] ; preparing arg for func call
+push 20
+pop [rex+1] ; preparing arg for func call
+push 2
+pop [rex+2] ; preparing arg for func call
+call drawCircle
+push 40
+pop [rex+0] ; preparing arg for func call
+push 10
+pop [rex+1] ; preparing arg for func call
+push 3
+pop [rex+2] ; preparing arg for func call
+call drawCircle
+push 30
+pop [rex+0] ; preparing arg for func call
+push 10
+pop [rex+1] ; preparing arg for func call
+push 8
+pop [rex+2] ; preparing arg for func call
+call drawCircle
+push 50
+pop [rex+0] ; preparing arg for func call
+push 10
+pop [rex+1] ; preparing arg for func call
+push 2
+pop [rex+2] ; preparing arg for func call
+call drawCircle
+push 50
+pop [rex+0] ; preparing arg for func call
+push 15
+pop [rex+1] ; preparing arg for func call
+push 7
+pop [rex+2] ; preparing arg for func call
+call drawCircle
 ret
 giveYouUp_guard:
 
 
-; solveSquareEquation function definition (source:4:14)
-jmp solveSquareEquation_guard
-solveSquareEquation:
-push 10
-pop [rex+0] ; identifier x
-; incrementing rex for 1
-inc rex; inc complete
+; drawCircle function definition (source:12:14)
+jmp drawCircle_guard
+drawCircle:
+push 0
+pop [rex+3] ; identifier angle
+push 0.005
+pop [rex+4] ; identifier step
+push 46
+pop [rex+5] ; identifier symbol
+; processing while:17:6
+lbl_17_6_begin__IAOLN:
+push [rex+3] ; identifier angle
+push [0] ; identifier pi
+push 2
+div ; 17:29
+le ; <
+push 0
+je lbl_17_6_cont__HBRCK
+; incrementing rex for 6
+push 6
+push rex
+add
+pop rex
+; inc complete
 
-push [rex-1] ; identifier x
-out
-pop
-push 20
+push [rex-3] ; identifier angle
+sin
+push 2
+mul ; 18:34
+push [rex-4] ; identifier r
+mul ; 18:37
 pop [rex+0] ; identifier x
+push [rex-3] ; identifier angle
+cos
+push [rex-4] ; identifier r
+mul ; 19:34
+pop [rex+1] ; identifier y
+push [rex-6] ; identifier x0
 push [rex+0] ; identifier x
-out
-pop
-; decrementing rex for 1
-dec rex; dec complete
+add ; 21:21
+pop rax; x coordinate
+push [rex-5] ; identifier y0
+push [rex+1] ; identifier y
+add ; 21:30
+pop rbx; y coordinate
+push [rex-1] ; identifier symbol
+pop rcx; pix value
+pixset rax rbx rcx
+rend
+push [rex-6] ; identifier x0
+push [rex+0] ; identifier x
+sub ; 22:21
+pop rax; x coordinate
+push [rex-5] ; identifier y0
+push [rex+1] ; identifier y
+add ; 22:30
+pop rbx; y coordinate
+push [rex-1] ; identifier symbol
+pop rcx; pix value
+pixset rax rbx rcx
+rend
+push [rex-6] ; identifier x0
+push [rex+0] ; identifier x
+sub ; 23:21
+pop rax; x coordinate
+push [rex-5] ; identifier y0
+push [rex+1] ; identifier y
+sub ; 23:30
+pop rbx; y coordinate
+push [rex-1] ; identifier symbol
+pop rcx; pix value
+pixset rax rbx rcx
+rend
+push [rex-6] ; identifier x0
+push [rex+0] ; identifier x
+add ; 24:21
+pop rax; x coordinate
+push [rex-5] ; identifier y0
+push [rex+1] ; identifier y
+sub ; 24:30
+pop rbx; y coordinate
+push [rex-1] ; identifier symbol
+pop rcx; pix value
+pixset rax rbx rcx
+rend
+push [rex-2] ; identifier step
+push [rex-3] ; identifier angle
+add ; Lex_AdAssg 26:16
+pop [rex-3] ; identifier angle
+; decrementing rex for 6
+push rex
+push 6
+sub
+pop rex
+; dec complete
 
-push [rex+0] ; identifier x
-push 5
-sub ; Lex_AdAssg 12:8
-pop [rex+0] ; identifier x
-push [rex+0] ; identifier x
-out
-pop
+jmp lbl_17_6_begin__IAOLN
+lbl_17_6_cont__HBRCK:
 ret
-solveSquareEquation_guard:
+drawCircle_guard:
 
-mov rex 0
+mov rex 1
 call giveYouUp
 hlt
 

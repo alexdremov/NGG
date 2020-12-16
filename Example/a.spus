@@ -1,0 +1,28 @@
+push 3.14159
+pop [0] ; identifier pi
+
+; giveYouUp function definition (source:2:14)
+jmp giveYouUp_guard
+giveYouUp:
+call someFun
+ret
+giveYouUp_guard:
+
+
+; someFun function definition (source:6:14)
+jmp someFun_guard
+someFun:
+push 1
+pop rax; x coordinate
+push 2
+pop rbx; y coordinate
+push 43
+pop rcx; pix value
+pixset rax rbx rcx
+ret
+someFun_guard:
+
+mov rex 1
+call giveYouUp
+hlt
+

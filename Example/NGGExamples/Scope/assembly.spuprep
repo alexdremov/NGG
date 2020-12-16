@@ -1,31 +1,143 @@
+push 3.14159
+pop [0]
 jmp giveYouUp_guard
 giveYouUp:
-call solveSquareEquation
-ret
-giveYouUp_guard:
-jmp solveSquareEquation_guard
-solveSquareEquation:
-push 10
-pop [rex+0]
-inc rex
-push [rex-1]
-out
-pop
 push 20
 pop [rex+0]
-push [rex+0]
-out
-pop
-dec rex
-push [rex+0]
-push 5
-sub
+push 20
+pop [rex+1]
+push 6
+pop [rex+2]
+call drawCircle
+push 20
 pop [rex+0]
-push [rex+0]
-out
-pop
+push 20
+pop [rex+1]
+push 2
+pop [rex+2]
+call drawCircle
+push 40
+pop [rex+0]
+push 10
+pop [rex+1]
+push 3
+pop [rex+2]
+call drawCircle
+push 30
+pop [rex+0]
+push 10
+pop [rex+1]
+push 8
+pop [rex+2]
+call drawCircle
+push 50
+pop [rex+0]
+push 10
+pop [rex+1]
+push 2
+pop [rex+2]
+call drawCircle
+push 50
+pop [rex+0]
+push 15
+pop [rex+1]
+push 7
+pop [rex+2]
+call drawCircle
 ret
-solveSquareEquation_guard:
-mov rex 0
+giveYouUp_guard:
+jmp drawCircle_guard
+drawCircle:
+push 0
+pop [rex+3]
+push 0.005
+pop [rex+4]
+push 46
+pop [rex+5]
+lbl_17_6_begin__IAOLN:
+push [rex+3]
+push [0]
+push 2
+div
+le
+push 0
+je lbl_17_6_cont__HBRCK
+push 6
+push rex
+add
+pop rex
+push [rex-3]
+sin
+push 2
+mul
+push [rex-4]
+mul
+pop [rex+0]
+push [rex-3]
+cos
+push [rex-4]
+mul
+pop [rex+1]
+push [rex-6]
+push [rex+0]
+add
+pop rax
+push [rex-5]
+push [rex+1]
+add
+pop rbx
+push [rex-1]
+pop rcx
+pixset rax rbx rcx
+rend
+push [rex-6]
+push [rex+0]
+sub
+pop rax
+push [rex-5]
+push [rex+1]
+add
+pop rbx
+push [rex-1]
+pop rcx
+pixset rax rbx rcx
+rend
+push [rex-6]
+push [rex+0]
+sub
+pop rax
+push [rex-5]
+push [rex+1]
+sub
+pop rbx
+push [rex-1]
+pop rcx
+pixset rax rbx rcx
+rend
+push [rex-6]
+push [rex+0]
+add
+pop rax
+push [rex-5]
+push [rex+1]
+sub
+pop rbx
+push [rex-1]
+pop rcx
+pixset rax rbx rcx
+rend
+push [rex-2]
+push [rex-3]
+add
+pop [rex-3]
+push rex
+push 6
+sub
+pop rex
+jmp lbl_17_6_begin__IAOLN
+lbl_17_6_cont__HBRCK:
+ret
+drawCircle_guard:
+mov rex 1
 call giveYouUp
 hlt

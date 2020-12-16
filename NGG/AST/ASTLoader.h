@@ -17,11 +17,10 @@ namespace NGG {
             return countNodes(head->getLeft()) + countNodes(head->getRight()) + 1;
         }
 
-        static void nodeRecursiveDump(ASTNode* head, FILE* fOut, size_t num = 0) {
+        static void nodeRecursiveDump(ASTNode* head, FILE* fOut, size_t& num) {
             if (head == nullptr){
                 return;
             }
-            num += 1;
             nodeDump(head, fOut, num);
             nodeRecursiveDump(head->getLeft(), fOut, num);
             nodeRecursiveDump(head->getRight(), fOut, num);
@@ -122,7 +121,7 @@ namespace NGG {
                     }
                     break;
                 default: {
-                    printf("Undefined node\n");
+                    printf("error: Undefined node\n");
                 }
             }
             num += 1;
@@ -133,7 +132,8 @@ namespace NGG {
         static void dump(ASTNode* head, FILE* outFile) {
             fprintf(outFile, "%zu"
                              "\n", countNodes(head));
-            nodeRecursiveDump(head, outFile);
+            size_t num = 1;
+            nodeRecursiveDump(head, outFile, num);
         }
     };
 }

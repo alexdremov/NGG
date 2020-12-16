@@ -261,6 +261,34 @@ namespace NGG {
             PARSE_PHRASE("run around", Lex_While)
         };
 
+        static Optional<NGG::Lexeme> tryParseLex_Sin(char *&ptr) {
+            PARSE_PHRASE("sin", Lex_Sin)
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Cos(char *&ptr) {
+            PARSE_PHRASE("cos", Lex_Cos)
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Abs(char *&ptr) {
+            PARSE_PHRASE("abs", Lex_Abs)
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Sqrt(char *&ptr) {
+            PARSE_PHRASE("sqrt", Lex_Sqrt)
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Setpix(char *&ptr) {
+            PARSE_PHRASE("setpix", Lex_Setpix)
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Exp(char *&ptr) {
+            PARSE_PHRASE("exp", Lex_Exp)
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Tan(char *&ptr) {
+            PARSE_PHRASE("tan", Lex_Tan)
+        };
+
         static Optional<NGG::Lexeme> tryParseLex_None(char *&ptr) {
             PARSE_SYMBOL(0, Lex_None)
         };

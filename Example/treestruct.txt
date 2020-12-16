@@ -1,0 +1,17 @@
+19
+Linker @ 3 4
+ 4 5
+VarDef "pi" 5 6
+Number 3.14159 6 7
+Linker @ 7 8
+FuncDecl "giveYouUp" 8 9
+Linker @ 9 10
+FuncCall "someFun" 10 11
+Linker @ 11 12
+FuncDecl "someFun" 12 13
+Linker @ 13 14
+ 14 15
+Linker @ 15 16
+Number 1 16 17
+Number 2 17 18
+Number 43 18 19

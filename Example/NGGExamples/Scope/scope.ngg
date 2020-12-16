@@ -1,16 +1,29 @@
+make you pi = 3.1415926535897323846 bdum
+
 never gonna giveYouUp() strangers
-    solveSquareEquation() bdum
+    drawCircle(20, 20, 6) bdum
+    drawCircle(20, 20, 2) bdum
+    drawCircle(40, 10, 3) bdum
+    drawCircle(30, 10, 8) bdum
+    drawCircle(50, 10, 2) bdum
+    drawCircle(50, 15, 7) bdum
 to love
 
-never gonna solveSquareEquation() strangers
-    make you x = 10 bdum
-    strangers
-        goodbye x bdum
-        make you x = 20 bdum
-        goodbye x bdum
+
+never gonna drawCircle(x0, y0, r) strangers
+    make you angle  = 0     bdum
+    make you step   = 0.005 bdum
+    make you symbol = 46    bdum
+    
+    run around (angle < pi / 2) strangers
+        make you x = sin(angle) * 2*r bdum
+        make you y = cos(angle) * r bdum
+        
+        setpix (x0 + x) (y0 + y) symbol bdum
+        setpix (x0 - x) (y0 + y) symbol bdum
+        setpix (x0 - x) (y0 - y) symbol bdum
+        setpix (x0 + x) (y0 - y) symbol bdum
+        
+        angle += step bdum
     to love
-    
-    x -= 5 bdum
-    goodbye x bdum
-    
 to love

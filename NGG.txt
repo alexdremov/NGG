@@ -27,15 +27,23 @@
     MulDivExpr       ::= UnaryExpr {(Mul['*'] | Div['/'] | Pow['^']) UnaryExpr}*
     UnaryExpr        ::= ((Plus['+'] | Minus['-']) PrimaryExpr)
                          | PrimaryExpr
-    PrimaryExpr      ::= LPA['('] rValue RPA[')']| Input | Number | FuncCall |
-                         Identifier
+    PrimaryExpr      ::= LPA['('] rValue RPA[')']| BasicFunc | Number | FuncCall  
+                         | Identifier
     FuncCall         ::= Identifier LPA['('] CallList? RPA[')']
+    BasicFunc        ::= Input | Sin | Cos | Tan | Sqrt | Exp | Abs
+    Sin              ::= Sin["sin"] LPA['('] rValue RPA[')']
+    Cos              ::= Cos["cos"] LPA['('] rValue RPA[')']
+    Tan              ::= Tan["tan"] LPA['('] rValue RPA[')']
+    Sqrt             ::= Sqrt["sqrt"] LPA['('] rValue RPA[')']
+    Abs              ::= Abs["abs"] LPA['('] rValue RPA[')']
+    Input            ::= Input['ask me']
+    Exp              ::= Exp["exp"] LPA['('] rValue RPA[')']
 
 +++
 *Blocks*
 
     BlockStmt        ::= BStart['strangers'] Statement* BEnd['to love']
-    Statement        ::= (VarDef | Print | AssignExpr |
+    Statement        ::= (VarDef | Print | SetPix | AssignExpr |
                           FuncCall)  StEnd['bdum']
                           | ReturnStmt | IfStmt | WhileStmt | BlockStmt
 
@@ -45,8 +53,8 @@
     VarDef           ::= VDecl['make you'] (Identifier Assg['=']
                          rValue |  Identifier )
     VarDefStmt       ::= VarDef StEnd['bdum']
-    Print            ::= Print['goodbye']     rValue
-    Input            ::= Input['ask me']
+    Print            ::= Print['goodbye'] rValue
+    SetPix.          ::= Print['septix'] rValue rValue rValue
 
 *Control Sequences*
 

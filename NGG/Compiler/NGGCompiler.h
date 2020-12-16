@@ -10,6 +10,8 @@
 #include "Compiler/CompileError.h"
 #include "AST/ASTLoader.h"
 
+#define EXP_VAL "2.7182818284"
+
 namespace NGG {
     class NGGCompiler {
         StrContainer *compiledString;
@@ -19,14 +21,84 @@ namespace NGG {
         VarTable env;
         const char *fileName;
 
+        void processFurther(ASTNode *head, bool valueNeeded = false, bool noScope = false) {
+            if (head == nullptr)
+                return;
+            switch (head->getKind()) {
+                case Kind_Linker:
+                    c_Linker(head, valueNeeded, noScope);
+                    break;
+                case Kind_FuncDecl:
+                    c_FuncDecl(head);
+                    break;
+                case Kind_Identifier:
+                    c_Identifier(head);
+                    break;
+                case Kind_Number:
+                    c_Number(head);
+                    break;
+                case Kind_AssignExpr:
+                    c_AssignExpr(head);
+                    break;
+                case Kind_VarDef:
+                    c_VarDef(head);
+                    break;
+                case Kind_MaUnOperator:
+                    c_MaUnOperator(head);
+                    break;
+                case Kind_MaOperator:
+                    c_MaOperator(head);
+                    break;
+                case Kind_Statement:
+                    c_Statement(head);
+                    break;
+                case Kind_FuncCall:
+                    c_FuncCall(head, valueNeeded);
+                    break;
+                case Kind_CmpOperator:
+                    c_CmpOperator(head);
+                    break;
+                case Kind_ReturnStmt:
+                    c_ReturnStmt(head);
+                    break;
+                case Kind_Print:
+                    c_Print(head);
+                    break;
+                case Kind_IfStmt:
+                    c_IfStmt(head);
+                    break;
+                case Kind_Input:
+                    c_Input(head);
+                    break;
+                case Kind_None:
+                    c_None(head);
+                    break;
+                case Kind_WhileStmt:
+                    c_WhileStmt(head);
+                    break;
+                case Kind_BasicFunction:
+                    c_BasicFunction(head, valueNeeded);
+                    break;
+                case Kind_Setpix:
+                    c_Setpix(head);
+                    break;
+                default: {
+                    CompileError err {};
+                    err.cTor("Undefined sequence: ", head->getLexeme());
+                    err.msg->sEndPrintf("%s", ASTNodeKindToString(head->getKind()));
+                    cErrors->push(err);
+                    break;
+                }
+            }
+        }
+
         void incRex(size_t num) {
             if (num == 0)
                 return;
             else if (num == 1) {
                 compiledString->sEndPrintf(
                         "; incrementing rex for 1\n"
-                        "inc rex"
-                        "; inc complete\n\n",
+                        "inc rex\n",
                         num, num);
             } else {
                 compiledString->sEndPrintf(
@@ -46,8 +118,7 @@ namespace NGG {
             else if (num == 1) {
                 compiledString->sEndPrintf(
                         "; decrementing rex for 1\n"
-                        "dec rex"
-                        "; dec complete\n\n",
+                        "dec rex\n",
                         num, num);
             } else {
                 compiledString->sEndPrintf(
@@ -141,6 +212,8 @@ namespace NGG {
             compiledString->sEndPrintf("ret\n"
                                        "%s:\n\n", guard->getStorage());
             env.deleteLocal();
+
+            StrContainer::Delete(guard);
         }
 
         void c_Identifier(ASTNode *head) {
@@ -160,6 +233,17 @@ namespace NGG {
 
         void c_Number(ASTNode *head) {
             compiledString->sEndPrintf("push %lg\n", head->getLexeme().getDouble());
+        }
+
+        void c_Setpix(ASTNode *head) {
+            processFurther(head->getLeft()->getLeft(), true);
+            compiledString->append("pop rax; x coordinate\n");
+            processFurther(head->getLeft()->getRight(), true);
+            compiledString->append("pop rbx; y coordinate\n");
+            processFurther(head->getRight(), true);
+            compiledString->append("pop rcx; pix value\n");
+            compiledString->append("pixset rax rbx rcx\n"
+                                   "rend\n");
         }
 
         void c_MaOperator(ASTNode *head) {
@@ -399,69 +483,63 @@ namespace NGG {
 
         void c_None(ASTNode *head) {}
 
-        void processFurther(ASTNode *head, bool valueNeeded = false, bool noScope = false) {
-            if (head == nullptr)
+        void c_WhileStmt(ASTNode *head) {
+            StrContainer continueLabel = getJmpLabel(head->getLexeme(), "cont");
+            StrContainer beginLabel = getJmpLabel(head->getLexeme(), "begin");
+
+            ASTNode *body = head->getRight();
+
+            compiledString->sEndPrintf("; processing while:%zu:%zu\n", head->getLexeme().getLine(),
+                                       head->getLexeme().getCol());
+
+            compiledString->sEndPrintf("%s:\n", beginLabel.begin());
+            processFurther(head->getLeft(), true);
+            compiledString->sEndPrintf("push 0\n"
+                                                "je %s\n", continueLabel.begin());
+
+            processFurther(body);
+            compiledString->sEndPrintf("jmp %s\n", beginLabel.begin());
+            compiledString->sEndPrintf("%s:\n", continueLabel.begin());
+            continueLabel.dTor();
+        }
+
+        void c_BasicFunction(ASTNode *head, bool valueNeeded = false) {
+            auto type = head->getLexeme().getType();
+            if (!valueNeeded)
                 return;
-            switch (head->getKind()) {
-                case Kind_Linker:
-                    c_Linker(head, valueNeeded, noScope);
+            switch (type) {
+                case Lex_Sin:
+                    processFurther(head->getLeft(), true);
+                    compiledString->append("sin\n");
                     break;
-                case Kind_FuncDecl:
-                    c_FuncDecl(head);
+                case Lex_Cos:
+                    processFurther(head->getLeft(), true);
+                    compiledString->append("cos\n");
                     break;
-                case Kind_Identifier:
-                    c_Identifier(head);
+                case Lex_Tan:
+                    processFurther(head->getLeft(), true);
+                    compiledString->append("tan\n");
                     break;
-                case Kind_Number:
-                    c_Number(head);
+                case Lex_Exp:
+                    compiledString->append("push " EXP_VAL "\n");
+                    processFurther(head->getLeft(), true);
+                    compiledString->append("pow\n");
                     break;
-                case Kind_AssignExpr:
-                    c_AssignExpr(head);
+                case Lex_Abs:
+                    processFurther(head->getLeft(), true);
+                    compiledString->append("abs\n");
                     break;
-                case Kind_VarDef:
-                    c_VarDef(head);
+                case Lex_Sqrt:
+                    processFurther(head->getLeft(), true);
+                    compiledString->append("push 0.5\n");
+                    compiledString->append("pow\n");
                     break;
-                case Kind_MaUnOperator:
-                    c_MaUnOperator(head);
-                    break;
-                case Kind_MaOperator:
-                    c_MaOperator(head);
-                    break;
-                case Kind_Statement:
-                    c_Statement(head);
-                    break;
-                case Kind_FuncCall:
-                    c_FuncCall(head, valueNeeded);
-                    break;
-                case Kind_CmpOperator:
-                    c_CmpOperator(head);
-                    break;
-                case Kind_ReturnStmt:
-                    c_ReturnStmt(head);
-                    break;
-                case Kind_Print:
-                    c_Print(head);
-                    break;
-                case Kind_IfStmt:
-                    c_IfStmt(head);
-                    break;
-                case Kind_Input:
-                    c_Input(head);
-                    break;
-                case Kind_None:
-                    c_None(head);
-                    break;
-                    /*
-                    case Kind_WhileStmt:
-                        c_WhileStmt(head);
-                        break;
-                    */
                 default: {
                     CompileError err {};
-                    err.cTor("Undefined sequence: ", head->getLexeme());
-                    err.msg->sEndPrintf("%s", ASTNodeKindToString(head->getKind()));
+                    err.cTor("Unknown function in c_BasicFunction: ", head->getLexeme());
+                    err.msg->sEndPrintf("%s", lexemeTypeToString(type));
                     cErrors->push(err);
-                    break;
+                    return;
                 }
             }
         }
@@ -587,7 +665,7 @@ namespace NGG {
         }
 
         void dumpTree() {
-            FILE* file = fopen("treestruct.txt", "w");
+            FILE *file = fopen("treestruct.txt", "w");
             ASTLoader::dump(tree.getHead(), file);
         }
     };

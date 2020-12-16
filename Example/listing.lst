@@ -1,0 +1,22 @@
+SPUAssembly v2.3.0r a.spus -> a.spub
+26    ->    35 | 10  | push <3.14159>                           |  0  1 6e 86 1b f0 f9 21  9 40 
+36    ->    45 | 10  | pop <[0]>                                |  1  5  0  0  0  0  0  0  0  0 
+46    ->    50 | 5   | jmp <giveYouUp_guard>                    |  f  b  0  0  0 
+x     ->     x | 0   | giveYouUp:                | 
+51    ->    55 | 5   | call <someFun>                           | 19  b  0  0  0 
+56    ->    56 | 1   | ret                                      | 1a 
+x     ->     x | 0   | giveYouUp_guard:          | 
+57    ->    61 | 5   | jmp <someFun_guard>                      |  f 34  0  0  0 
+x     ->     x | 0   | someFun:                  | 
+62    ->    71 | 10  | push <1>                                 |  0  1  0  0  0  0  0  0 f0 3f 
+72    ->    74 | 3   | pop <rax>                                |  1  2  0 
+75    ->    84 | 10  | push <2>                                 |  0  1  0  0  0  0  0  0  0 40 
+85    ->    87 | 3   | pop <rbx>                                |  1  2  1 
+88    ->    97 | 10  | push <43>                                |  0  1  0  0  0  0  0 80 45 40 
+98    ->   100 | 3   | pop <rcx>                                |  1  2  2 
+101   ->   107 | 7   | pixset <rax><rbx><rcx>                   | 1f  2  0  2  1  2  2 
+108   ->   108 | 1   | ret                                      | 1a 
+x     ->     x | 0   | someFun_guard:            | 
+109   ->   120 | 12  | mov <rex><1>                             | 1b  2  4  1  0  0  0  0  0  0 f0 3f 
+121   ->   125 | 5   | call <giveYouUp>                         | 19 ba ff ff ff 
+126   ->   126 | 1   | hlt                                      |  d 

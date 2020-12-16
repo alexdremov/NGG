@@ -38,7 +38,10 @@ public:
         for (size_t i = 0; i < size; i++) {
             data[i].dTor();
         }
-        free(data);
+        if(data != nullptr) {
+            free(data);
+            data = reinterpret_cast<Elem *>(0xBADF);
+        }
     }
 
     static void Delete(ClassicStack *obj) {
