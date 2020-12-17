@@ -3,9 +3,9 @@ make you pi = 3.1415926535897323846 bdum
 never gonna giveYouUp() strangers
     drawCircle(20, 20, 6, 43) bdum
     drawCircle(20, 20, 2, 42) bdum
-    drawCircle(40, 10, 3) bdum
+    drawCircle(40, 10, 3)     bdum
     drawCircle(30, 10, 8, 42) bdum
-    drawCircle(50, 10, 2) bdum
+    drawCircle(50, 10, 2)     bdum
     drawCircle(50, 15, 7, 45) bdum
 to love
 

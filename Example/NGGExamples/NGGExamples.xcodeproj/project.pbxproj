@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		A0BA7648258BF94900FF760D /* a.spus */ = {isa = PBXFileReference; lastKnownFileType = text; path = a.spus; sourceTree = "<group>"; };
 		A0FB47642584ACE800807B06 /* lexemes.lex */ = {isa = PBXFileReference; lastKnownFileType = text; path = lexemes.lex; sourceTree = "<group>"; };
 		A0FB47662584ACE800807B06 /* assembly.spuprep */ = {isa = PBXFileReference; lastKnownFileType = text; path = assembly.spuprep; sourceTree = "<group>"; };
 		A0FB47672584ACE800807B06 /* code.svg */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = code.svg; sourceTree = "<group>"; };
@@ -23,7 +24,6 @@
 		A0FB477F2588337600807B06 /* code.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = code.png; sourceTree = "<group>"; };
 		A0FB47812588FE0F00807B06 /* scope.ngg */ = {isa = PBXFileReference; lastKnownFileType = text; path = scope.ngg; sourceTree = "<group>"; };
 		A0FB47862588FF2600807B06 /* code.svg */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = code.svg; sourceTree = "<group>"; };
-		A0FB47872588FF2600807B06 /* a.spus */ = {isa = PBXFileReference; lastKnownFileType = text; path = a.spus; sourceTree = "<group>"; };
 		A0FB47882588FF2600807B06 /* assembly.spuprep */ = {isa = PBXFileReference; lastKnownFileType = text; path = assembly.spuprep; sourceTree = "<group>"; };
 		A0FB47892588FF2600807B06 /* a.spub */ = {isa = PBXFileReference; lastKnownFileType = file; path = a.spub; sourceTree = "<group>"; };
 		A0FB478A2588FF2600807B06 /* lexemes.lex */ = {isa = PBXFileReference; lastKnownFileType = text; path = lexemes.lex; sourceTree = "<group>"; };
@@ -73,7 +73,7 @@
 			isa = PBXGroup;
 			children = (
 				A0FB47892588FF2600807B06 /* a.spub */,
-				A0FB47872588FF2600807B06 /* a.spus */,
+				A0BA7648258BF94900FF760D /* a.spus */,
 				A0FB47882588FF2600807B06 /* assembly.spuprep */,
 				A0FB478B2588FF2600807B06 /* code.png */,
 				A0FB47862588FF2600807B06 /* code.svg */,

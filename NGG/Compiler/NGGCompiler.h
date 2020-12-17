@@ -11,8 +11,6 @@
 #include "ASTLoader/ASTLoader.h"
 #include "LexicalAnalysis/LexParser.h"
 
-#define EXP_VAL "2.7182818284"
-
 namespace NGG {
     class NGGCompiler {
         StrContainer *compiledString;
@@ -537,11 +535,13 @@ namespace NGG {
                     processFurther(head->getLeft(), true);
                     compiledString->append("tan\n");
                     break;
-                case Lex_Exp:
-                    compiledString->append("push " EXP_VAL "\n");
+                case Lex_Exp: {
+                    double e = 2.7182818284;
+                    compiledString->sEndPrintf("push %lg\n", e);
                     processFurther(head->getLeft(), true);
                     compiledString->append("pow\n");
                     break;
+                }
                 case Lex_Abs:
                     processFurther(head->getLeft(), true);
                     compiledString->append("abs\n");

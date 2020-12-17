@@ -3,22 +3,23 @@
 #include "Helpers/ParamsParser.h"
 
 
-int main(const int argc, const char* argv[]) {
-    auto params = CLParams{};
+int main(const int argc, const char *argv[]) {
+    auto params = CLParams {};
     params.cTor();
     bool result = params.parseArgs(argc, argv);
 
-    if (!result){
+    if (!result) {
         printf("error: ngg: Error processing command line arguments\n");
         return EXIT_FAILURE;
     }
-    NGG::NGGCompiler compiler{};
+    NGG::NGGCompiler compiler {};
     compiler.cTor();
 
     compiler.loadFile(params.inputFileName);
     if (params.lexemes)
         compiler.printLexemes(params.lexFileName);
-    if(!compiler.isParseSuccessful()){
+
+    if (!compiler.isParseSuccessful()) {
         compiler.dumpErrorStack(params.inputFileRealName);
         printf("error: ngg: Unsuccessful parse\n");
         compiler.dTor();
@@ -34,7 +35,7 @@ int main(const int argc, const char* argv[]) {
 
     compiler.compile();
 
-    if (!compiler.isCompileSuccessful()){
+    if (!compiler.isCompileSuccessful()) {
         compiler.dumpCompileErrorStack(params.inputFileRealName);
         printf("error: ngg: Unsuccessful parse\n");
         compiler.dTor();
@@ -44,9 +45,9 @@ int main(const int argc, const char* argv[]) {
 
     compiler.saveAsmSource("a.spus");
 
-    NGG::NGGCompiler::genBytecode("a.spus",  params);
+    NGG::NGGCompiler::genBytecode("a.spus", params);
 
-    if (!params.keepCode){
+    if (!params.keepCode) {
         system("rm a.spus");
     }
     compiler.dTor();
