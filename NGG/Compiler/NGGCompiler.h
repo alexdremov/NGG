@@ -8,7 +8,8 @@
 #include "VarTable.h"
 #include "Helpers/ParamsParser.h"
 #include "Compiler/CompileError.h"
-#include "AST/ASTLoader.h"
+#include "ASTLoader/ASTLoader.h"
+#include "LexicalAnalysis/LexParser.h"
 
 #define EXP_VAL "2.7182818284"
 
@@ -187,21 +188,30 @@ namespace NGG {
         }
 
         void c_FuncDecl(ASTNode *head) {
-            StrContainer *label = head->getLexeme().getString();
-            StrContainer *guard = StrContainer::New();
-            guard->cTor(label->begin());
-            guard->append("_guard");
+            StrContainer label {};
+            label.cTor(head->getLexeme().getString()->begin());
+
+            size_t argCount = 0;
+            ASTNode *arg = head->getLeft();
+            while (arg != nullptr && arg->getKind() != Kind_None) {
+                argCount++;
+                arg = arg->getRight();
+            }
+            label.sEndPrintf("_%zuargs", argCount);
+            StrContainer guard {};
+            guard.cTor(label.begin());
+            guard.append("_guard");
             compiledString->sEndPrintf("\n; %s function definition (source:%zu:%zu)\n",
-                                       label->getStorage(), head->getLexeme().getLine(), head->getLexeme().getCol());
+                                       label.getStorage(), head->getLexeme().getLine(), head->getLexeme().getCol());
 
             compiledString->sEndPrintf("jmp %s\n"
-                                       "%s:\n", guard->getStorage(),
-                                       label->getStorage());
+                                       "%s:\n", guard.getStorage(),
+                                       label.getStorage());
 
             env.addNewLevel(true);
-            if (head->getLeft()->getKind() != Kind_None) {
+            if (head->getLeft() != nullptr && head->getLeft()->getKind() != Kind_None) {
                 ASTNode *cur = head->getLeft();
-                while (cur != nullptr) {
+                while (cur != nullptr && cur->getKind() != Kind_None) {
                     Lexeme name = cur->getLeft()->getLexeme();
                     env.def(name.getString());
                     cur = cur->getRight();
@@ -210,10 +220,12 @@ namespace NGG {
 
             processFurther(head->getRight(), false, true);
             compiledString->sEndPrintf("ret\n"
-                                       "%s:\n\n", guard->getStorage());
+                                       "%s:\n\n", guard.getStorage());
             env.deleteLocal();
 
-            StrContainer::Delete(guard);
+            guard.dTor();
+            label.dTor();
+
         }
 
         void c_Identifier(ASTNode *head) {
@@ -378,21 +390,26 @@ namespace NGG {
         void c_FuncCall(ASTNode *head, bool valueNeeded = false) {
             ASTNode *lastNode = head->getLeft();
 
-            if (lastNode->getKind() != Kind_None) {
-                int argOffset = 0;
-                while (lastNode != nullptr) {
-                    processFurther(lastNode->getLeft(), true);
-                    compiledString->sEndPrintf("pop [rex+%zu] ; preparing arg for func call\n",
-                                               env.getLocalOffset() + argOffset);
-                    lastNode = lastNode->getRight();
-                    argOffset++;
-                }
+            int argOffset = 0;
+            while (lastNode != nullptr && lastNode->getKind() != Kind_None) {
+                processFurther(lastNode->getLeft(), true);
+                compiledString->sEndPrintf("pop [rex+%zu] ; preparing arg for func call\n",
+                                           env.getLocalOffset() + argOffset);
+                lastNode = lastNode->getRight();
+                argOffset++;
             }
+
+
+            StrContainer label {};
+            label.cTor(head->getLexeme().getString()->begin());
+            label.sEndPrintf("_%dargs", argOffset);
+
             incRex(env.getLocalOffset());
-            compiledString->sEndPrintf("call %s\n", head->getLexeme().getString()->begin());
+            compiledString->sEndPrintf("call %s\n", label.begin());
             decRex(env.getLocalOffset());
             if (valueNeeded)
                 compiledString->sEndPrintf("push rax ; pushing return value\n");
+            label.dTor();
         }
 
         void c_CmpOperator(ASTNode *head) {
@@ -430,7 +447,7 @@ namespace NGG {
         }
 
         void c_ReturnStmt(ASTNode *head) {
-            if (head->getLeft()->getKind() != Kind_None) {
+            if (head->getLeft() != nullptr && head->getLeft()->getKind() != Kind_None) {
                 processFurther(head->getLeft(), true);
                 decRex(env.getFunctionOffset());
                 compiledString->sEndPrintf("pop rax ; return value\n"
@@ -495,7 +512,7 @@ namespace NGG {
             compiledString->sEndPrintf("%s:\n", beginLabel.begin());
             processFurther(head->getLeft(), true);
             compiledString->sEndPrintf("push 0\n"
-                                                "je %s\n", continueLabel.begin());
+                                       "je %s\n", continueLabel.begin());
 
             processFurther(body);
             compiledString->sEndPrintf("jmp %s\n", beginLabel.begin());
@@ -555,6 +572,12 @@ namespace NGG {
             cErrors = ClassicStack<CompileError>::New();
         }
 
+        void cTor(ASTNode *head) {
+            this->cTor();
+            tree.dTor();
+            tree.cTor(head);
+        }
+
         void dTor() {
             tree.dTor();
             env.dTor();
@@ -578,7 +601,7 @@ namespace NGG {
         void compile() {
             processFurther(tree.getHead());
             compiledString->sEndPrintf("mov rex %d\n"
-                                       "call giveYouUp\n"
+                                       "call giveYouUp_0args\n"
                                        "hlt\n\n", env.getLocalOffset());
         }
 

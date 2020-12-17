@@ -877,6 +877,11 @@ namespace NGG {
             this->errorStack.cTor(0);
         }
 
+        void cTor(ASTNode* newHead) {
+            this->head = newHead;
+            this->errorStack.cTor(0);
+        }
+
         void dTor() {
             if (head)
                 ASTNode::Delete(head);

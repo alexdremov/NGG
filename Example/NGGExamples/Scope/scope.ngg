@@ -1,19 +1,38 @@
 make you pi = 3.1415926535897323846 bdum
 
 never gonna giveYouUp() strangers
-    drawCircle(20, 20, 6) bdum
-    drawCircle(20, 20, 2) bdum
+    drawCircle(20, 20, 6, 43) bdum
+    drawCircle(20, 20, 2, 42) bdum
     drawCircle(40, 10, 3) bdum
-    drawCircle(30, 10, 8) bdum
+    drawCircle(30, 10, 8, 42) bdum
     drawCircle(50, 10, 2) bdum
-    drawCircle(50, 15, 7) bdum
+    drawCircle(50, 15, 7, 45) bdum
 to love
 
-
 never gonna drawCircle(x0, y0, r) strangers
+    drawCircle(x0, y0, r, 39) bdum
+to love
+
+never gonna drawCircle(x0, y0, r, symbol) strangers
     make you angle  = 0     bdum
-    make you step   = 0.005 bdum
-    make you symbol = 46    bdum
+    make you step   = pi / 100 bdum
+    
+    run around (angle < pi / 2) strangers
+        make you x = sin(angle) * 2*r bdum
+        make you y = cos(angle) * r bdum
+        
+        setpix (x0 + x) (y0 + y) symbol bdum
+        setpix (x0 - x) (y0 + y) symbol bdum
+        setpix (x0 - x) (y0 - y) symbol bdum
+        setpix (x0 + x) (y0 - y) symbol bdum
+        
+        angle += step bdum
+    to love
+to love
+
+never gonna dre(x0, y0, r, symbol) strangers
+    make you angle  = 0     bdum
+    make you step   = pi / 100 bdum
     
     run around (angle < pi / 2) strangers
         make you x = sin(angle) * 2*r bdum

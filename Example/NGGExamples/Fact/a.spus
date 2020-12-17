@@ -1,20 +1,20 @@
 
-; giveYouUp function definition (source:0:13)
-jmp giveYouUp_guard
-giveYouUp:
-in ; input 1:19 
+; giveYouUp_0args function definition (source:0:13)
+jmp giveYouUp_0args_guard
+giveYouUp_0args:
+in ; input 0:0 
 pop [rex+0] ; preparing arg for func call
-call fact
+call fact_1args
 push rax ; pushing return value
 out
 pop
 ret
-giveYouUp_guard:
+giveYouUp_0args_guard:
 
 
-; fact function definition (source:4:14)
-jmp fact_guard
-fact:
+; fact_1args function definition (source:4:14)
+jmp fact_1args_guard
+fact_1args:
 ; processing if:5:6
 push [rex+0] ; identifier num
 push 1
@@ -22,43 +22,37 @@ leq ; <=
 push 0
 je lbl_5_6_else__IAOLN
 ; incrementing rex for 1
-inc rex; inc complete
-
+inc rex
 push 1
 ; decrementing rex for 1
-dec rex; dec complete
-
+dec rex
 pop rax ; return value
 ret
 ; decrementing rex for 1
-dec rex; dec complete
-
+dec rex
 jmp lbl_5_6_cont__HBRCK
 lbl_5_6_else__IAOLN:
 ; incrementing rex for 1
-inc rex; inc complete
-
+inc rex
 push [rex-1] ; identifier num
 push 1
 sub ; 8:48
 pop [rex+0] ; preparing arg for func call
-call fact
+call fact_1args
 push rax ; pushing return value
 push [rex-1] ; identifier num
 mul ; 8:53
 ; decrementing rex for 1
-dec rex; dec complete
-
+dec rex
 pop rax ; return value
 ret
 ; decrementing rex for 1
-dec rex; dec complete
-
+dec rex
 lbl_5_6_cont__HBRCK:
 ret
-fact_guard:
+fact_1args_guard:
 
 mov rex 0
-call giveYouUp
+call giveYouUp_0args
 hlt
 

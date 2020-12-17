@@ -1,8 +1,7 @@
 #include "LexicalAnalysis/LexParser.h"
-#include "AST/AST.h"
 #include "Compiler/NGGCompiler.h"
 #include "Helpers/ParamsParser.h"
-#include "AST/ASTLoader.h"
+
 
 int main(const int argc, const char* argv[]) {
     auto params = CLParams{};

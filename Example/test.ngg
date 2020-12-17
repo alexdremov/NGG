@@ -1,9 +1,12 @@
-make you pi = 3.1415926535897323846 bdum
-
 never gonna giveYouUp() strangers
-    someFun() bdum
+    goodbye fact(ask me) bdum
 to love
 
-never gonna someFun() strangers
-    setpix 1 2 43 bdum
+never gonna fact(num) strangers
+    make you x = 0 bdum
+    you know the rules (num <= 1) strangers
+        known each other for so long 1 bdum
+    to love and so do i strangers
+        known each other for so long fact(num - 1) * num bdum
+    to love
 to love

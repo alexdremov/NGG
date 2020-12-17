@@ -1,28 +1,90 @@
-push 3.14159
-pop [0] ; identifier pi
 
-; giveYouUp function definition (source:2:14)
-jmp giveYouUp_guard
-giveYouUp:
-call someFun
+; giveYouUp_0args function definition (source:0:13)
+jmp giveYouUp_0args_guard
+giveYouUp_0args:
+in ; input 0:0 
+pop [rex+0] ; preparing arg for func call
+call fact_1args
+push rax ; pushing return value
+out
+pop
 ret
-giveYouUp_guard:
+giveYouUp_0args_guard:
 
 
-; someFun function definition (source:6:14)
-jmp someFun_guard
-someFun:
+; fact_1args function definition (source:4:14)
+jmp fact_1args_guard
+fact_1args:
+push 0
+pop [rex+1] ; identifier x
+; processing if:6:6
+push [rex+0] ; identifier num
 push 1
-pop rax; x coordinate
+leq ; <=
+push 0
+je lbl_6_6_else__IAOLN
+; incrementing rex for 2
 push 2
-pop rbx; y coordinate
-push 43
-pop rcx; pix value
-pixset rax rbx rcx
-ret
-someFun_guard:
+push rex
+add
+pop rex
+; inc complete
 
-mov rex 1
-call giveYouUp
+push 1
+; decrementing rex for 2
+push rex
+push 2
+sub
+pop rex
+; dec complete
+
+pop rax ; return value
+ret
+; decrementing rex for 2
+push rex
+push 2
+sub
+pop rex
+; dec complete
+
+jmp lbl_6_6_cont__HBRCK
+lbl_6_6_else__IAOLN:
+; incrementing rex for 2
+push 2
+push rex
+add
+pop rex
+; inc complete
+
+push [rex-2] ; identifier num
+push 1
+sub ; 9:48
+pop [rex+0] ; preparing arg for func call
+call fact_1args
+push rax ; pushing return value
+push [rex-2] ; identifier num
+mul ; 9:53
+; decrementing rex for 2
+push rex
+push 2
+sub
+pop rex
+; dec complete
+
+pop rax ; return value
+ret
+; decrementing rex for 2
+push rex
+push 2
+sub
+pop rex
+; dec complete
+
+lbl_6_6_cont__HBRCK:
+ret
+fact_1args_guard:
+
+mov rex 0
+call giveYouUp_0args
 hlt
 

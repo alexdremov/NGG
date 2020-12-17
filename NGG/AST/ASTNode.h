@@ -87,6 +87,14 @@ namespace NGG {
         void setRight(ASTNode *rightNode) {
             this->right = rightNode;
         }
+
+        void setKind(ASTNodeKind newKind){
+            this->kind = newKind;
+        }
+
+        void setLinkKind(ASTNodeKind newKind){
+            this->linkKind = newKind;
+        }
     };
 }
 

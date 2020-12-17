@@ -1,15 +1,15 @@
-jmp giveYouUp_guard
-giveYouUp:
+jmp giveYouUp_0args_guard
+giveYouUp_0args:
 in
 pop [rex+0]
-call fact
+call fact_1args
 push rax
 out
 pop
 ret
-giveYouUp_guard:
-jmp fact_guard
-fact:
+giveYouUp_0args_guard:
+jmp fact_1args_guard
+fact_1args:
 push [rex+0]
 push 1
 leq
@@ -28,7 +28,7 @@ push [rex-1]
 push 1
 sub
 pop [rex+0]
-call fact
+call fact_1args
 push rax
 push [rex-1]
 mul
@@ -38,7 +38,7 @@ ret
 dec rex
 lbl_5_6_cont__HBRCK:
 ret
-fact_guard:
+fact_1args_guard:
 mov rex 0
-call giveYouUp
+call giveYouUp_0args
 hlt

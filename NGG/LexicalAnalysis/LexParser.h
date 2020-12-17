@@ -11,64 +11,205 @@
 #include "Lexeme.h"
 #include "SwiftyList/SwiftyList.hpp"
 
-#define PARSE_SYMBOL(sym, type) \
-    Optional<Lexeme> retVal{}; retVal.cTor();\
-    skipInvis(ptr);\
-    char* offset = ptr;\
-    if (*ptr != sym)\
-        return retVal;          \
-    Lexeme parsed{}; parsed.cTor(type, offset); \
-    ptr++;                    \
-    retVal.cTor(parsed);\
-    return retVal;
-
-#define PARSE_PHRASE(phr, type) \
-    Optional<Lexeme> retVal{}; retVal.cTor();\
-    skipInvis(ptr);\
-    char* offset = ptr;\
-    if (!expectPhrase(ptr, phr))\
-        return retVal;\
-    \
-    Lexeme parsed{}; parsed.cTor(type, offset);\
-    retVal.cTor(parsed);\
-    return retVal;
-
 namespace NGG {
     class LexParser {
-        static bool isCharacter(char ptr) {
-            return ('a' <= ptr && ptr <= 'z') || ('A' <= ptr && ptr <= 'Z') || ptr == '_';
-        }
+        struct LexAlias{
+            const char* alias;
+            LexemeType  type;
+        };
 
-        static void getOffsets(const char *offset, const char *start, size_t &line, size_t &col) {
-            if (offset == nullptr || start == nullptr)
-                return;
-            col = 0;
-            line = 0;
-            while (start <= offset) {
-                if (*start == '\n') {
-                    line++;
-                    col = 0;
-                }
-                col++;
-                start++;
-            }
-        }
+        constexpr static LexAlias lexAliases[] = {
+                {"", Lex_None},
+                {"never gonna", Lex_FDecl},
+                {"(", Lex_LPA},
+                {")", Lex_RPA},
+                {"ask me", Lex_Input},
+                {",", Lex_Comma},
+                {"^", Lex_Pow},
+                {"==", Lex_Eq},
+                {"<=", Lex_Leq},
+                {">=", Lex_Geq},
+                {"!=", Lex_Neq},
+                {">", Lex_Gr},
+                {"<", Lex_Le},
+                {"+", Lex_Plus},
+                {"-", Lex_Minus},
+                {"*", Lex_Mul},
+                {"/", Lex_Div},
+                {"strangers", Lex_BStart},
+                {"to love", Lex_BEnd},
+                {"bdum", Lex_StEnd},
+                {"known each other for so long", Lex_Return},
+                {"=", Lex_Assg},
+                {"+=", Lex_AdAssg},
+                {"-=", Lex_MiAssg},
+                {"*=", Lex_MuAssg},
+                {"/=", Lex_DiAssg},
+                {"make you", Lex_VDecl},
+                {"goodbye", Lex_Print},
+                {"you know the rules", Lex_If},
+                {"and so do i", Lex_Else},
+                {"run around", Lex_While},
+                {"sin", Lex_Sin},
+                {"cos", Lex_Cos},
+                {"abs", Lex_Abs},
+                {"sqrt", Lex_Sqrt},
+                {"setpix", Lex_Setpix},
+                {"exp", Lex_Exp},
+                {"tan", Lex_Tan},
+        };
 
-        static bool isDigit(char ptr) {
-            return ('0' <= ptr && ptr <= '9');
-        }
+        static Optional<NGG::Lexeme> tryParseLex_FDecl(char *&ptr) {
+            return parsePhrase(ptr, Lex_FDecl);
+        };
 
-        static void skipInvis(char *&ptr) {
-            while (isspace(*ptr)) ptr++;
-        }
+        static Optional<NGG::Lexeme> tryParseLex_LPA(char *&ptr) {
+            return parsePhrase(ptr, Lex_LPA);
+        };
 
-        static bool expectPhrase(char *&ptr, const char *cmp) {
-            if (ptr == strstr(ptr, cmp)) {
-                ptr += strlen(cmp);
-                return true;
-            }
-            return false;
-        }
+        static Optional<NGG::Lexeme> tryParseLex_Input(char *&ptr) {
+            return parsePhrase(ptr, Lex_Input);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_RPA(char *&ptr) {
+            return parsePhrase(ptr, Lex_RPA);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Comma(char *&ptr) {
+            return parsePhrase(ptr, Lex_Comma);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Pow(char *&ptr) {
+            return parsePhrase(ptr, Lex_Pow);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Eq(char *&ptr) {
+            return parsePhrase(ptr, Lex_Eq);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Leq(char *&ptr) {
+            return parsePhrase(ptr, Lex_Leq);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Geq(char *&ptr) {
+            return parsePhrase(ptr, Lex_Geq);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Neq(char *&ptr) {
+            return parsePhrase(ptr, Lex_Neq);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Gr(char *&ptr) {
+            return parsePhrase(ptr, Lex_Gr);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Le(char *&ptr) {
+            return parsePhrase(ptr, Lex_Le);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Plus(char *&ptr) {
+            return parsePhrase(ptr, Lex_Plus);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Minus(char *&ptr) {
+            return parsePhrase(ptr, Lex_Minus);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Mul(char *&ptr) {
+            return parsePhrase(ptr, Lex_Mul);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Div(char *&ptr) {
+            return parsePhrase(ptr, Lex_Div);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_BStart(char *&ptr) {
+            return parsePhrase(ptr, Lex_BStart);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_BEnd(char *&ptr) {
+            return parsePhrase(ptr, Lex_BEnd);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_StEnd(char *&ptr) {
+            return parsePhrase(ptr, Lex_StEnd);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Return(char *&ptr) {
+            return parsePhrase(ptr, Lex_Return);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Assg(char *&ptr) {
+            return parsePhrase(ptr, Lex_Assg);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_AdAssg(char *&ptr) {
+            return parsePhrase(ptr, Lex_AdAssg);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_MiAssg(char *&ptr) {
+            return parsePhrase(ptr, Lex_MiAssg);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_MuAssg(char *&ptr) {
+            return parsePhrase(ptr, Lex_MuAssg);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_DiAssg(char *&ptr) {
+            return parsePhrase(ptr, Lex_DiAssg);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_VDecl(char *&ptr) {
+            return parsePhrase(ptr, Lex_VDecl);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Print(char *&ptr) {
+            return parsePhrase(ptr, Lex_Print);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_If(char *&ptr) {
+            return parsePhrase(ptr, Lex_If);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Else(char *&ptr) {
+            return parsePhrase(ptr, Lex_Else);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_While(char *&ptr) {
+            return parsePhrase(ptr, Lex_While);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Sin(char *&ptr) {
+            return parsePhrase(ptr, Lex_Sin);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Cos(char *&ptr) {
+            return parsePhrase(ptr, Lex_Cos);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Abs(char *&ptr) {
+            return parsePhrase(ptr, Lex_Abs);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Sqrt(char *&ptr) {
+            return parsePhrase(ptr, Lex_Sqrt);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Setpix(char *&ptr) {
+            return parsePhrase(ptr, Lex_Setpix);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Exp(char *&ptr) {
+            return parsePhrase(ptr, Lex_Exp);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_Tan(char *&ptr) {
+            return parsePhrase(ptr, Lex_Tan);
+        };
+
+        static Optional<NGG::Lexeme> tryParseLex_None(char *&ptr) {
+            return parsePhrase(ptr, Lex_None);
+        };
 
         static Optional<Lexeme> tryParseLex_NumberInt(char *&ptr) {
             Optional<Lexeme> retVal {};
@@ -89,6 +230,7 @@ namespace NGG {
             ptr += size;
             return retVal;
         };
+
 
         static Optional<Lexeme> tryParseLex_Number(char *&ptr) {
             Optional<Lexeme> retVal {};
@@ -141,159 +283,63 @@ namespace NGG {
             return retVal;
         };
 
-        static Optional<NGG::Lexeme> tryParseLex_FDecl(char *&ptr) {
-            PARSE_PHRASE("never gonna", Lex_FDecl)
-        };
+        static bool isCharacter(char ptr) {
+            return ('a' <= ptr && ptr <= 'z') || ('A' <= ptr && ptr <= 'Z') || ptr == '_';
+        }
 
-        static Optional<NGG::Lexeme> tryParseLex_LPA(char *&ptr) {
-            PARSE_SYMBOL('(', Lex_LPA)
-        };
+        static bool expectPhrase(char *&ptr, const char *cmp) {
+            if (ptr == strstr(ptr, cmp)) {
+                ptr += strlen(cmp);
+                return true;
+            }
+            return false;
+        }
 
-        static Optional<NGG::Lexeme> tryParseLex_Input(char *&ptr) {
-            PARSE_PHRASE("ask me", Lex_Input)
-        };
+        static void getOffsets(const char *offset, const char *start, size_t &line, size_t &col) {
+            if (offset == nullptr || start == nullptr)
+                return;
+            col = 0;
+            line = 0;
+            while (start <= offset) {
+                if (*start == '\n') {
+                    line++;
+                    col = 0;
+                }
+                col++;
+                start++;
+            }
+        }
 
-        static Optional<NGG::Lexeme> tryParseLex_RPA(char *&ptr) {
-            PARSE_SYMBOL(')', Lex_RPA)
-        };
+        static bool isDigit(char ptr) {
+            return ('0' <= ptr && ptr <= '9');
+        }
 
-        static Optional<NGG::Lexeme> tryParseLex_Comma(char *&ptr) {
-            PARSE_SYMBOL(',', Lex_Comma)
-        };
+        static void skipInvis(char *&ptr) {
+            while (isspace(*ptr)) ptr++;
+        }
 
-        static Optional<NGG::Lexeme> tryParseLex_Pow(char *&ptr) {
-            PARSE_SYMBOL('^', Lex_Pow)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Eq(char *&ptr) {
-            PARSE_PHRASE("==", Lex_Eq)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Leq(char *&ptr) {
-            PARSE_PHRASE("<=", Lex_Leq)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Geq(char *&ptr) {
-            PARSE_PHRASE(">=", Lex_Geq)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Neq(char *&ptr) {
-            PARSE_PHRASE("!=", Lex_Neq)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Gr(char *&ptr) {
-            PARSE_SYMBOL('>', Lex_Gr)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Le(char *&ptr) {
-            PARSE_SYMBOL('<', Lex_Le)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Plus(char *&ptr) {
-            PARSE_SYMBOL('+', Lex_Plus)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Minus(char *&ptr) {
-            PARSE_SYMBOL('-', Lex_Minus)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Mul(char *&ptr) {
-            PARSE_SYMBOL('*', Lex_Mul)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Div(char *&ptr) {
-            PARSE_SYMBOL('/', Lex_Div)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_BStart(char *&ptr) {
-            PARSE_PHRASE("strangers", Lex_BStart)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_BEnd(char *&ptr) {
-            PARSE_PHRASE("to love", Lex_BEnd)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_StEnd(char *&ptr) {
-            PARSE_PHRASE("bdum", Lex_StEnd)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Return(char *&ptr) {
-            PARSE_PHRASE("known each other for so long", Lex_Return)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Assg(char *&ptr) {
-            PARSE_SYMBOL('=', Lex_Assg)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_AdAssg(char *&ptr) {
-            PARSE_PHRASE("+=", Lex_AdAssg)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_MiAssg(char *&ptr) {
-            PARSE_PHRASE("-=", Lex_MiAssg)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_MuAssg(char *&ptr) {
-            PARSE_PHRASE("*=", Lex_MuAssg)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_DiAssg(char *&ptr) {
-            PARSE_PHRASE("/=", Lex_DiAssg)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_VDecl(char *&ptr) {
-            PARSE_PHRASE("make you", Lex_VDecl)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Print(char *&ptr) {
-            PARSE_PHRASE("goodbye", Lex_Print)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_If(char *&ptr) {
-            PARSE_PHRASE("you know the rules", Lex_If)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Else(char *&ptr) {
-            PARSE_PHRASE("and so do i", Lex_Else)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_While(char *&ptr) {
-            PARSE_PHRASE("run around", Lex_While)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Sin(char *&ptr) {
-            PARSE_PHRASE("sin", Lex_Sin)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Cos(char *&ptr) {
-            PARSE_PHRASE("cos", Lex_Cos)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Abs(char *&ptr) {
-            PARSE_PHRASE("abs", Lex_Abs)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Sqrt(char *&ptr) {
-            PARSE_PHRASE("sqrt", Lex_Sqrt)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Setpix(char *&ptr) {
-            PARSE_PHRASE("setpix", Lex_Setpix)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Exp(char *&ptr) {
-            PARSE_PHRASE("exp", Lex_Exp)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_Tan(char *&ptr) {
-            PARSE_PHRASE("tan", Lex_Tan)
-        };
-
-        static Optional<NGG::Lexeme> tryParseLex_None(char *&ptr) {
-            PARSE_SYMBOL(0, Lex_None)
-        };
+        static Optional<Lexeme> parsePhrase(char *&ptr, LexemeType type) {
+            Optional<Lexeme> retVal{}; retVal.cTor();
+            skipInvis(ptr);
+            auto alias = findAlias(type);
+            auto phr = alias.alias;
+            char* offset = ptr;
+            if (!expectPhrase(ptr, phr))
+                return retVal;
+            Lexeme parsed{}; parsed.cTor(type, offset);\
+            retVal.cTor(parsed);\
+            return retVal;
+        }
 
     public:
+        static LexAlias findAlias(LexemeType type){
+            for (auto lexAliase : lexAliases) {
+                if (lexAliase.type == type)
+                    return lexAliase;
+            }
+            return lexAliases[0];
+        }
+
         static SwiftyList<NGG::Lexeme>* parse(StrContainer *content) {
             auto* result = SwiftyList<NGG::Lexeme>::CreateNovel(0,0, nullptr, false);
 

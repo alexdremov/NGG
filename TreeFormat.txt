@@ -34,20 +34,18 @@
 | Тип |  | Описание | Левое | Правое |
 |:--|:--|:--|:--|:--|
 | Link | no | Используется для связки блоков. | any | NULL / Link |
-| FuncDecl | str | Связанное значение - имя объявляемой функции | ArgDeclList | Link |
+| FuncDecl | str | Связанное значение - имя объявляемой функции | Link | Link |
 | Input | no | Узел, запрашивающий у пользователя ввод | NULL | NULL |
 | Identifier | str | Имя переменной | NULL | NULL |
 | Number | num | Значение | NULL | NULL |
-| ArgDeclList | no | Список аргументов функции (объявление)  | Identifier | NULL / ArgDeclList |
-| ArgCallList | no | Список аргументов функции (вызов) | Operator / Number / Identifier | ArgCallList |
-| FuncCall | str | Связанное значение - имя вызываемой функции | ArgCallList | NULL |
+| FuncCall | str | Связанное значение - имя вызываемой функции | Link | NULL |
 | ReturnStmt | no |  | Operator / Number / Identifier | NULL |
 | AssignExpr | str | Возможные значения: «=» «+=» «-=» «*=» «/=» | Identifier | Operator / Number / Identifier |
 | VarDef | str | Связанное значение - имя новой переменной | Operator / Number / Identifier / NULL | NULL |
 | Print | no |  | Operator / Number / Identifier | NULL |
 | IfStmt | no | У правого левое - положительный исход; у правого правое - ложный исход | Operator / Number / Identifier | LINKER[LINKER; LINKER] |
 | WhileStmt | no | | Operator / Number / Identifier | LINKER |
-| Operator | str | Возможные значения: «+» «-» «/» «^» «==» «!=» «<=» «>=» «!=»| Operator / Number / Identifier | Operator / Number / Identifier |
+| Operator | str | Возможные значения: «+» «-» «/» «\^» «==» «!=» «<=» «>=» «!=»| Operator / Number / Identifier | Operator / Number / Identifier |
 
 
 ## Формат Файла
@@ -58,9 +56,10 @@
 <тип узла> <связанное значение> <номер L> <номер R>
 
 - Ноль нумерация
+- Нулевой узел - None. На него ссылаются NULLPTR
 - Возможные связанные значения:
 	- str ::= &quot;content&quot; 
-	- num ::= число
+	- num ::= число (%lg)
 	- no ::= @
 +++
 ### Примеры:

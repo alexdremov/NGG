@@ -1,79 +1,108 @@
 push 3.14159
 pop [0]
-jmp giveYouUp_guard
-giveYouUp:
+jmp giveYouUp_0args_guard
+giveYouUp_0args:
 push 20
 pop [rex+0]
 push 20
 pop [rex+1]
 push 6
 pop [rex+2]
-call drawCircle
+push 43
+pop [rex+3]
+call drawCircle_4args
 push 20
 pop [rex+0]
 push 20
 pop [rex+1]
 push 2
 pop [rex+2]
-call drawCircle
+push 42
+pop [rex+3]
+call drawCircle_4args
 push 40
 pop [rex+0]
 push 10
 pop [rex+1]
 push 3
 pop [rex+2]
-call drawCircle
+call drawCircle_3args
 push 30
 pop [rex+0]
 push 10
 pop [rex+1]
 push 8
 pop [rex+2]
-call drawCircle
+push 42
+pop [rex+3]
+call drawCircle_4args
 push 50
 pop [rex+0]
 push 10
 pop [rex+1]
 push 2
 pop [rex+2]
-call drawCircle
+call drawCircle_3args
 push 50
 pop [rex+0]
 push 15
 pop [rex+1]
 push 7
 pop [rex+2]
-call drawCircle
-ret
-giveYouUp_guard:
-jmp drawCircle_guard
-drawCircle:
-push 0
+push 45
 pop [rex+3]
-push 0.005
+call drawCircle_4args
+ret
+giveYouUp_0args_guard:
+jmp drawCircle_3args_guard
+drawCircle_3args:
+push [rex+0]
+pop [rex+3]
+push [rex+1]
 pop [rex+4]
-push 46
+push [rex+2]
 pop [rex+5]
-lbl_17_6_begin__IAOLN:
-push [rex+3]
+push 39
+pop [rex+6]
+push 3
+push rex
+add
+pop rex
+call drawCircle_4args
+push rex
+push 3
+sub
+pop rex
+ret
+drawCircle_3args_guard:
+jmp drawCircle_4args_guard
+drawCircle_4args:
+push 0
+pop [rex+4]
+push [0]
+push 100
+div
+pop [rex+5]
+lbl_19_6_begin__IAOLN:
+push [rex+4]
 push [0]
 push 2
 div
 le
 push 0
-je lbl_17_6_cont__HBRCK
+je lbl_19_6_cont__HBRCK
 push 6
 push rex
 add
 pop rex
-push [rex-3]
+push [rex-2]
 sin
 push 2
 mul
 push [rex-4]
 mul
 pop [rex+0]
-push [rex-3]
+push [rex-2]
 cos
 push [rex-4]
 mul
@@ -86,58 +115,150 @@ push [rex-5]
 push [rex+1]
 add
 pop rbx
-push [rex-1]
-pop rcx
-pixset rax rbx rcx
-rend
-push [rex-6]
-push [rex+0]
-sub
-pop rax
-push [rex-5]
-push [rex+1]
-add
-pop rbx
-push [rex-1]
-pop rcx
-pixset rax rbx rcx
-rend
-push [rex-6]
-push [rex+0]
-sub
-pop rax
-push [rex-5]
-push [rex+1]
-sub
-pop rbx
-push [rex-1]
-pop rcx
-pixset rax rbx rcx
-rend
-push [rex-6]
-push [rex+0]
-add
-pop rax
-push [rex-5]
-push [rex+1]
-sub
-pop rbx
-push [rex-1]
-pop rcx
-pixset rax rbx rcx
-rend
-push [rex-2]
 push [rex-3]
+pop rcx
+pixset rax rbx rcx
+rend
+push [rex-6]
+push [rex+0]
+sub
+pop rax
+push [rex-5]
+push [rex+1]
 add
-pop [rex-3]
+pop rbx
+push [rex-3]
+pop rcx
+pixset rax rbx rcx
+rend
+push [rex-6]
+push [rex+0]
+sub
+pop rax
+push [rex-5]
+push [rex+1]
+sub
+pop rbx
+push [rex-3]
+pop rcx
+pixset rax rbx rcx
+rend
+push [rex-6]
+push [rex+0]
+add
+pop rax
+push [rex-5]
+push [rex+1]
+sub
+pop rbx
+push [rex-3]
+pop rcx
+pixset rax rbx rcx
+rend
+push [rex-1]
+push [rex-2]
+add
+pop [rex-2]
 push rex
 push 6
 sub
 pop rex
-jmp lbl_17_6_begin__IAOLN
-lbl_17_6_cont__HBRCK:
+jmp lbl_19_6_begin__IAOLN
+lbl_19_6_cont__HBRCK:
 ret
-drawCircle_guard:
+drawCircle_4args_guard:
+jmp dre_4args_guard
+dre_4args:
+push 0
+pop [rex+4]
+push [0]
+push 100
+div
+pop [rex+5]
+lbl_36_6_begin__XHBQE:
+push [rex+4]
+push [0]
+push 2
+div
+le
+push 0
+je lbl_36_6_cont__AFMCD
+push 6
+push rex
+add
+pop rex
+push [rex-2]
+sin
+push 2
+mul
+push [rex-4]
+mul
+pop [rex+0]
+push [rex-2]
+cos
+push [rex-4]
+mul
+pop [rex+1]
+push [rex-6]
+push [rex+0]
+add
+pop rax
+push [rex-5]
+push [rex+1]
+add
+pop rbx
+push [rex-3]
+pop rcx
+pixset rax rbx rcx
+rend
+push [rex-6]
+push [rex+0]
+sub
+pop rax
+push [rex-5]
+push [rex+1]
+add
+pop rbx
+push [rex-3]
+pop rcx
+pixset rax rbx rcx
+rend
+push [rex-6]
+push [rex+0]
+sub
+pop rax
+push [rex-5]
+push [rex+1]
+sub
+pop rbx
+push [rex-3]
+pop rcx
+pixset rax rbx rcx
+rend
+push [rex-6]
+push [rex+0]
+add
+pop rax
+push [rex-5]
+push [rex+1]
+sub
+pop rbx
+push [rex-3]
+pop rcx
+pixset rax rbx rcx
+rend
+push [rex-1]
+push [rex-2]
+add
+pop [rex-2]
+push rex
+push 6
+sub
+pop rex
+jmp lbl_36_6_begin__XHBQE
+lbl_36_6_cont__AFMCD:
+ret
+dre_4args_guard:
 mov rex 1
-call giveYouUp
+call giveYouUp_0args
 hlt
