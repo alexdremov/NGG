@@ -7,14 +7,14 @@
 
 namespace NGG {
     enum LexemeType {
-        #define LEXEME(l) Lex_ ## l,
-        #include "LexemeType.mpl"
+        #define LEXEME(str, l) Lex_ ## l,
+            #include "LexemeType.mpl"
         #undef LEXEME
     };
 
     static const char* lexemeTypeToString(LexemeType type){
         const char* result = "<none>";
-        #define LEXEME(l) if (type == Lex_ ## l) return #l;
+        #define LEXEME(str, l) if (type == Lex_ ## l) return #l;
         #include "LexemeType.mpl"
 
 #undef LEXEME

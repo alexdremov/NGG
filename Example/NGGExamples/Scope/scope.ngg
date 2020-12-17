@@ -29,20 +29,3 @@ never gonna drawCircle(x0, y0, r, symbol) strangers
         angle += step bdum
     to love
 to love
-
-never gonna dre(x0, y0, r, symbol) strangers
-    make you angle  = 0     bdum
-    make you step   = pi / 100 bdum
-    
-    run around (angle < pi / 2) strangers
-        make you x = sin(angle) * 2*r bdum
-        make you y = cos(angle) * r bdum
-        
-        setpix (x0 + x) (y0 + y) symbol bdum
-        setpix (x0 - x) (y0 + y) symbol bdum
-        setpix (x0 - x) (y0 - y) symbol bdum
-        setpix (x0 + x) (y0 - y) symbol bdum
-        
-        angle += step bdum
-    to love
-to love

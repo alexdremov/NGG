@@ -9,37 +9,34 @@ x     ->     x | 0   | giveYouUp_0args:          |
 54    ->    55 | 2   | pop                                      |  1  0 
 56    ->    56 | 1   | ret                                      | 1a 
 x     ->     x | 0   | giveYouUp_0args_guard:    | 
-57    ->    61 | 5   | jmp <fact_1args_guard>                   |  f 89  0  0  0 
+57    ->    61 | 5   | jmp <fact_1args_guard>                   |  f 81  0  0  0 
 x     ->     x | 0   | fact_1args:               | 
 62    ->    72 | 11  | push <[rex+0]>                           |  0  7  0  0  0  0  0  0  0  0  4 
 73    ->    82 | 10  | push <1>                                 |  0  1  0  0  0  0  0  0 f0 3f 
 83    ->    83 | 1   | leq                                      | 25 
 84    ->    93 | 10  | push <0>                                 |  0  1  0  0  0  0  0  0  0  0 
-94    ->    98 | 5   | je <lbl_5_6_else__IAOLN>                 | 12 21  0  0  0 
+94    ->    98 | 5   | je <lbl_5_2_cont__HBRCK>                 | 12 1c  0  0  0 
 99    ->   101 | 3   | inc <rex>                                | 17  2  4 
 102   ->   111 | 10  | push <1>                                 |  0  1  0  0  0  0  0  0 f0 3f 
 112   ->   114 | 3   | dec <rex>                                | 18  2  4 
 115   ->   117 | 3   | pop <rax>                                |  1  2  0 
 118   ->   118 | 1   | ret                                      | 1a 
 119   ->   121 | 3   | dec <rex>                                | 18  2  4 
-122   ->   126 | 5   | jmp <lbl_5_6_cont__HBRCK>                |  f 47  0  0  0 
-x     ->     x | 0   | lbl_5_6_else__IAOLN:      | 
-127   ->   129 | 3   | inc <rex>                                | 17  2  4 
-130   ->   140 | 11  | push <[rex-1]>                           |  0  7  0  0  0  0  0  0 f0 bf  4 
-141   ->   150 | 10  | push <1>                                 |  0  1  0  0  0  0  0  0 f0 3f 
-151   ->   151 | 1   | sub                                      |  6 
-152   ->   162 | 11  | pop <[rex+0]>                            |  1  7  0  0  0  0  0  0  0  0  4 
-163   ->   167 | 5   | call <fact_1args>                        | 19 9b ff ff ff 
-168   ->   170 | 3   | push <rax>                               |  0  2  0 
-171   ->   181 | 11  | push <[rex-1]>                           |  0  7  0  0  0  0  0  0 f0 bf  4 
-182   ->   182 | 1   | mul                                      |  7 
-183   ->   185 | 3   | dec <rex>                                | 18  2  4 
-186   ->   188 | 3   | pop <rax>                                |  1  2  0 
-189   ->   189 | 1   | ret                                      | 1a 
-190   ->   192 | 3   | dec <rex>                                | 18  2  4 
-x     ->     x | 0   | lbl_5_6_cont__HBRCK:      | 
-193   ->   193 | 1   | ret                                      | 1a 
+x     ->     x | 0   | lbl_5_2_cont__HBRCK:      | 
+122   ->   132 | 11  | push <[rex+0]>                           |  0  7  0  0  0  0  0  0  0  0  4 
+133   ->   142 | 10  | push <1>                                 |  0  1  0  0  0  0  0  0 f0 3f 
+143   ->   143 | 1   | sub                                      |  6 
+144   ->   154 | 11  | pop <[rex+1]>                            |  1  7  0  0  0  0  0  0 f0 3f  4 
+155   ->   157 | 3   | inc <rex>                                | 17  2  4 
+158   ->   162 | 5   | call <fact_1args>                        | 19 a0 ff ff ff 
+163   ->   165 | 3   | dec <rex>                                | 18  2  4 
+166   ->   168 | 3   | push <rax>                               |  0  2  0 
+169   ->   179 | 11  | push <[rex+0]>                           |  0  7  0  0  0  0  0  0  0  0  4 
+180   ->   180 | 1   | mul                                      |  7 
+181   ->   183 | 3   | pop <rax>                                |  1  2  0 
+184   ->   184 | 1   | ret                                      | 1a 
+185   ->   185 | 1   | ret                                      | 1a 
 x     ->     x | 0   | fact_1args_guard:         | 
-194   ->   205 | 12  | mov <rex><0>                             | 1b  2  4  1  0  0  0  0  0  0  0  0 
-206   ->   210 | 5   | call <giveYouUp_0args>                   | 19 51 ff ff ff 
-211   ->   211 | 1   | hlt                                      |  d 
+186   ->   197 | 12  | mov <rex><0>                             | 1b  2  4  1  0  0  0  0  0  0  0  0 
+198   ->   202 | 5   | call <giveYouUp_0args>                   | 19 59 ff ff ff 
+203   ->   203 | 1   | hlt                                      |  d 

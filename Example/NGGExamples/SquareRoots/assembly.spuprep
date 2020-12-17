@@ -1,16 +1,16 @@
-jmp giveYouUp_guard
-giveYouUp:
+jmp giveYouUp_0args_guard
+giveYouUp_0args:
 in
 pop [rex+0]
 in
 pop [rex+1]
 in
 pop [rex+2]
-call solveSquareEquation
+call solveSquareEquation_3args
 ret
-giveYouUp_guard:
-jmp solveSquareEquation_guard
-solveSquareEquation:
+giveYouUp_0args_guard:
+jmp solveSquareEquation_3args_guard
+solveSquareEquation_3args:
 push [rex+0]
 push 0
 eq
@@ -144,7 +144,7 @@ sub
 pop rex
 lbl_5_6_cont__HBRCK:
 ret
-solveSquareEquation_guard:
+solveSquareEquation_3args_guard:
 mov rex 0
-call giveYouUp
+call giveYouUp_0args
 hlt

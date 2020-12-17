@@ -1,17 +1,17 @@
 SPUAssembly v2.3.0r a.spus -> a.spub
-26    ->    30 | 5   | jmp <giveYouUp_guard>                    |  f 32  0  0  0 
-x     ->     x | 0   | giveYouUp:                | 
+26    ->    30 | 5   | jmp <giveYouUp_0args_guard>              |  f 32  0  0  0 
+x     ->     x | 0   | giveYouUp_0args:          | 
 31    ->    32 | 2   | in                                       |  2  0 
 33    ->    43 | 11  | pop <[rex+0]>                            |  1  7  0  0  0  0  0  0  0  0  4 
 44    ->    45 | 2   | in                                       |  2  0 
 46    ->    56 | 11  | pop <[rex+1]>                            |  1  7  0  0  0  0  0  0 f0 3f  4 
 57    ->    58 | 2   | in                                       |  2  0 
 59    ->    69 | 11  | pop <[rex+2]>                            |  1  7  0  0  0  0  0  0  0 40  4 
-70    ->    74 | 5   | call <solveSquareEquation>               | 19  b  0  0  0 
+70    ->    74 | 5   | call <solveSquareEquation_3args>         | 19  b  0  0  0 
 75    ->    75 | 1   | ret                                      | 1a 
-x     ->     x | 0   | giveYouUp_guard:          | 
-76    ->    80 | 5   | jmp <solveSquareEquation_guard>          |  f b2  2  0  0 
-x     ->     x | 0   | solveSquareEquation:      | 
+x     ->     x | 0   | giveYouUp_0args_guard:    | 
+76    ->    80 | 5   | jmp <solveSquareEquation_3args_guard>    |  f b2  2  0  0 
+x     ->     x | 0   | solveSquareEquation_3args: | 
 81    ->    91 | 11  | push <[rex+0]>                           |  0  7  0  0  0  0  0  0  0  0  4 
 92    ->   101 | 10  | push <0>                                 |  0  1  0  0  0  0  0  0  0  0 
 102   ->   102 | 1   | eq                                       | 27 
@@ -145,7 +145,7 @@ x     ->     x | 0   | lbl_18_10_cont__BCITC:    |
 762   ->   764 | 3   | pop <rex>                                |  1  2  4 
 x     ->     x | 0   | lbl_5_6_cont__HBRCK:      | 
 765   ->   765 | 1   | ret                                      | 1a 
-x     ->     x | 0   | solveSquareEquation_guard: | 
+x     ->     x | 0   | solveSquareEquation_3args_guard: | 
 766   ->   777 | 12  | mov <rex><0>                             | 1b  2  4  1  0  0  0  0  0  0  0  0 
-778   ->   782 | 5   | call <giveYouUp>                         | 19 15 fd ff ff 
+778   ->   782 | 5   | call <giveYouUp_0args>                   | 19 15 fd ff ff 
 783   ->   783 | 1   | hlt                                      |  d 

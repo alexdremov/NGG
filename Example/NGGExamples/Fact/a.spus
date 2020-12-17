@@ -15,12 +15,12 @@ giveYouUp_0args_guard:
 ; fact_1args function definition (source:4:14)
 jmp fact_1args_guard
 fact_1args:
-; processing if:5:6
+; processing if:5:2
 push [rex+0] ; identifier num
 push 1
 leq ; <=
 push 0
-je lbl_5_6_else__IAOLN
+je lbl_5_2_cont__HBRCK
 ; incrementing rex for 1
 inc rex
 push 1
@@ -30,25 +30,21 @@ pop rax ; return value
 ret
 ; decrementing rex for 1
 dec rex
-jmp lbl_5_6_cont__HBRCK
-lbl_5_6_else__IAOLN:
+lbl_5_2_cont__HBRCK:
+push [rex+0] ; identifier num
+push 1
+sub ; 7:40
+pop [rex+1] ; preparing arg for func call
 ; incrementing rex for 1
 inc rex
-push [rex-1] ; identifier num
-push 1
-sub ; 8:48
-pop [rex+0] ; preparing arg for func call
 call fact_1args
-push rax ; pushing return value
-push [rex-1] ; identifier num
-mul ; 8:53
 ; decrementing rex for 1
 dec rex
+push rax ; pushing return value
+push [rex+0] ; identifier num
+mul ; 7:45
 pop rax ; return value
 ret
-; decrementing rex for 1
-dec rex
-lbl_5_6_cont__HBRCK:
 ret
 fact_1args_guard:
 

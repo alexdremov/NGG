@@ -9,6 +9,7 @@
 #include <cctype>
 #include "Helpers/Optional.h"
 #include "Lexeme.h"
+#include "LexemeType.h"
 #include "SwiftyList/SwiftyList.hpp"
 
 namespace NGG {
@@ -19,44 +20,9 @@ namespace NGG {
         };
 
         constexpr static LexAlias lexAliases[] = {
-                {"", Lex_None},
-                {"never gonna", Lex_FDecl},
-                {"(", Lex_LPA},
-                {")", Lex_RPA},
-                {"ask me", Lex_Input},
-                {",", Lex_Comma},
-                {"^", Lex_Pow},
-                {"==", Lex_Eq},
-                {"<=", Lex_Leq},
-                {">=", Lex_Geq},
-                {"!=", Lex_Neq},
-                {">", Lex_Gr},
-                {"<", Lex_Le},
-                {"+", Lex_Plus},
-                {"-", Lex_Minus},
-                {"*", Lex_Mul},
-                {"/", Lex_Div},
-                {"strangers", Lex_BStart},
-                {"to love", Lex_BEnd},
-                {"bdum", Lex_StEnd},
-                {"known each other for so long", Lex_Return},
-                {"=", Lex_Assg},
-                {"+=", Lex_AdAssg},
-                {"-=", Lex_MiAssg},
-                {"*=", Lex_MuAssg},
-                {"/=", Lex_DiAssg},
-                {"make you", Lex_VDecl},
-                {"goodbye", Lex_Print},
-                {"you know the rules", Lex_If},
-                {"and so do i", Lex_Else},
-                {"run around", Lex_While},
-                {"sin", Lex_Sin},
-                {"cos", Lex_Cos},
-                {"abs", Lex_Abs},
-                {"sqrt", Lex_Sqrt},
-                {"setpix", Lex_Setpix},
-                {"exp", Lex_Exp},
-                {"tan", Lex_Tan},
+            #define LEXEME(str, type) {str, Lex_ ## type},
+                #include "LexemeType.mpl"
+            #undef LEXEME
         };
 
         static Optional<NGG::Lexeme> tryParseLex_FDecl(char *&ptr) {
@@ -352,8 +318,8 @@ namespace NGG {
                 Optional<NGG::Lexeme> parsed {};
                 parsed.cTor();
 
-                #define LEXEME(l) TRY_PARSE(Lex_ ## l);
-                #include "LexemeType.mpl"
+                #define LEXEME(str, l) TRY_PARSE(Lex_ ## l);
+                    #include "LexemeType.mpl"
                 #undef LEXEME
 
                 printf("Undefined sequence at \"%s\"\n", ptr);

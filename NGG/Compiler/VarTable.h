@@ -152,7 +152,7 @@ namespace NGG {
             if (functionScope.isEmpty())
                 return 0;
             size_t offset = 0;
-            for (int i = storage.getSize() - 1; i >= *functionScope.top(); --i)
+            for (int i = *functionScope.top(); i + 1 < storage.getSize(); ++i)
                 offset += storage.get(i).getSize();
 
             return offset;

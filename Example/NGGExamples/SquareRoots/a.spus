@@ -1,21 +1,21 @@
 
-; giveYouUp function definition (source:0:13)
-jmp giveYouUp_guard
-giveYouUp:
-in ; input 1:26 
+; giveYouUp_0args function definition (source:0:13)
+jmp giveYouUp_0args_guard
+giveYouUp_0args:
+in ; input 0:0 
 pop [rex+0] ; preparing arg for func call
-in ; input 1:34 
+in ; input 0:0 
 pop [rex+1] ; preparing arg for func call
-in ; input 1:42 
+in ; input 0:0 
 pop [rex+2] ; preparing arg for func call
-call solveSquareEquation
+call solveSquareEquation_3args
 ret
-giveYouUp_guard:
+giveYouUp_0args_guard:
 
 
-; solveSquareEquation function definition (source:4:14)
-jmp solveSquareEquation_guard
-solveSquareEquation:
+; solveSquareEquation_3args function definition (source:4:14)
+jmp solveSquareEquation_3args_guard
+solveSquareEquation_3args:
 ; processing if:5:6
 push [rex+0] ; identifier a
 push 0
@@ -98,8 +98,7 @@ eq ; ==
 push 0
 je lbl_18_10_else__JTNDV
 ; incrementing rex for 1
-inc rex; inc complete
-
+inc rex
 push 1
 out
 pop
@@ -113,13 +112,11 @@ div ; 20:25
 out
 pop
 ; decrementing rex for 1
-dec rex; dec complete
-
+dec rex
 jmp lbl_18_10_cont__BCITC
 lbl_18_10_else__JTNDV:
 ; incrementing rex for 1
-inc rex; inc complete
-
+inc rex
 ; processing if:22:14
 push [rex-1] ; identifier d
 push 0
@@ -162,8 +159,7 @@ out
 pop
 lbl_22_14_cont__HIBAF:
 ; decrementing rex for 1
-dec rex; dec complete
-
+dec rex
 lbl_18_10_cont__BCITC:
 ; decrementing rex for 3
 push rex
@@ -174,9 +170,9 @@ pop rex
 
 lbl_5_6_cont__HBRCK:
 ret
-solveSquareEquation_guard:
+solveSquareEquation_3args_guard:
 
 mov rex 0
-call giveYouUp
+call giveYouUp_0args
 hlt
 

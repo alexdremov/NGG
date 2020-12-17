@@ -14,29 +14,26 @@ push [rex+0]
 push 1
 leq
 push 0
-je lbl_5_6_else__IAOLN
+je lbl_5_2_cont__HBRCK
 inc rex
 push 1
 dec rex
 pop rax
 ret
 dec rex
-jmp lbl_5_6_cont__HBRCK
-lbl_5_6_else__IAOLN:
-inc rex
-push [rex-1]
+lbl_5_2_cont__HBRCK:
+push [rex+0]
 push 1
 sub
-pop [rex+0]
+pop [rex+1]
+inc rex
 call fact_1args
-push rax
-push [rex-1]
-mul
 dec rex
+push rax
+push [rex+0]
+mul
 pop rax
 ret
-dec rex
-lbl_5_6_cont__HBRCK:
 ret
 fact_1args_guard:
 mov rex 0
