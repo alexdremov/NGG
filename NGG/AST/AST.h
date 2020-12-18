@@ -668,7 +668,7 @@ namespace NGG {
             auto *nodeId = ASTNode::New();
             nodeId->cTor(Kind_Identifier, name);
 
-            node->cTor(Kind_AssignExpr, opLex, value.unwrap(), nodeId);
+            node->cTor(Kind_AssignExpr, opLex, nodeId, value.unwrap());
 
             retValue.cTor(node);
             return retValue;

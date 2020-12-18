@@ -1,7 +1,7 @@
 
 
 never gonna giveYouUp () strangers
-	make you tmp = 0 bdum
+	make you tmp  bdum
 	run around (tmp != 5) strangers
 		not_main(tmp, tmp, tmp) bdum
 		tmp += 1 bdum
@@ -10,6 +10,6 @@ to love
 
 
 never gonna not_main (a, b, c) strangers
-	make you d = a + ((b ^ 2) + (c ^ 3)) bdum
+	make you d  bdum
 	goodbye d bdum
 to love

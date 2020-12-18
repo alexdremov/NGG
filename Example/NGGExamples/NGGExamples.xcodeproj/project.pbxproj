@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		A03D0445258C8A65002CB533 /* test.ngg */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.ngg; sourceTree = "<group>"; };
+		A03D0446258C8A65002CB533 /* treestruct.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = treestruct.txt; sourceTree = "<group>"; };
+		A03D0447258C8A65002CB533 /* generated.ngg */ = {isa = PBXFileReference; lastKnownFileType = text; path = generated.ngg; sourceTree = "<group>"; };
+		A03D0448258C8AFB002CB533 /* listing.lst */ = {isa = PBXFileReference; lastKnownFileType = text; path = listing.lst; sourceTree = "<group>"; };
+		A03D0449258C8AFB002CB533 /* lexemes.lex */ = {isa = PBXFileReference; lastKnownFileType = text; path = lexemes.lex; sourceTree = "<group>"; };
+		A03D044A258C8B03002CB533 /* assembly.spuprep */ = {isa = PBXFileReference; lastKnownFileType = text; path = assembly.spuprep; sourceTree = "<group>"; };
+		A03D044B258C8B03002CB533 /* a.spus */ = {isa = PBXFileReference; lastKnownFileType = text; path = a.spus; sourceTree = "<group>"; };
+		A03D044C258C8B03002CB533 /* code.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = code.png; sourceTree = "<group>"; };
+		A03D044D258C8B03002CB533 /* a.spub */ = {isa = PBXFileReference; lastKnownFileType = file; path = a.spub; sourceTree = "<group>"; };
+		A03D044E258C8B03002CB533 /* code.svg */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = code.svg; sourceTree = "<group>"; };
 		A0BA7648258BF94900FF760D /* a.spus */ = {isa = PBXFileReference; lastKnownFileType = text; path = a.spus; sourceTree = "<group>"; };
 		A0FB47642584ACE800807B06 /* lexemes.lex */ = {isa = PBXFileReference; lastKnownFileType = text; path = lexemes.lex; sourceTree = "<group>"; };
 		A0FB47662584ACE800807B06 /* assembly.spuprep */ = {isa = PBXFileReference; lastKnownFileType = text; path = assembly.spuprep; sourceTree = "<group>"; };
@@ -32,9 +42,27 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		A03D0440258C8961002CB533 /* Translations */ = {
+			isa = PBXGroup;
+			children = (
+				A03D044D258C8B03002CB533 /* a.spub */,
+				A03D044B258C8B03002CB533 /* a.spus */,
+				A03D044A258C8B03002CB533 /* assembly.spuprep */,
+				A03D044C258C8B03002CB533 /* code.png */,
+				A03D044E258C8B03002CB533 /* code.svg */,
+				A03D0449258C8AFB002CB533 /* lexemes.lex */,
+				A03D0448258C8AFB002CB533 /* listing.lst */,
+				A03D0447258C8A65002CB533 /* generated.ngg */,
+				A03D0445258C8A65002CB533 /* test.ngg */,
+				A03D0446258C8A65002CB533 /* treestruct.txt */,
+			);
+			path = Translations;
+			sourceTree = "<group>";
+		};
 		A0FB47562583F8A100807B06 = {
 			isa = PBXGroup;
 			children = (
+				A03D0440258C8961002CB533 /* Translations */,
 				A0FB47802588FE0F00807B06 /* Scope */,
 				A0FB47732588099200807B06 /* SquareRoots */,
 				A0FB47612583F8E000807B06 /* Fact */,
@@ -87,9 +115,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
+		A03D0441258C8A4F002CB533 /* Translations */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "--input test.ngg --output a.spub --lst listing.lst -o -E -g --lex lexemes.lex -d";
+			buildConfigurationList = A03D0442258C8A4F002CB533 /* Build configuration list for PBXLegacyTarget "Translations" */;
+			buildPhases = (
+			);
+			buildToolPath = "/Users/aleksandrdremov/Desktop/Обучение/МФТИ/ФПМИ/BigProjects/SpecCode/build/ngg";
+			buildWorkingDirectory = "/Users/aleksandrdremov/Desktop/Обучение/МФТИ/ФПМИ/BigProjects/SpecCode/Example/NGGExamples/Translations";
+			dependencies = (
+			);
+			name = Translations;
+			passBuildSettingsInEnvironment = 0;
+			productName = NGGExamples;
+		};
 		A0FB475B2583F8A100807B06 /* Fact */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--input factorial.ngg --output a.spub --lst listing.lst -o -E -g --lex lexemes.lex";
+			buildArgumentsString = "--input factorial.ngg --output a.spub --lst listing.lst -o -E -g --lex lexemes.lex -d";
 			buildConfigurationList = A0FB475E2583F8A100807B06 /* Build configuration list for PBXLegacyTarget "Fact" */;
 			buildPhases = (
 			);
@@ -157,11 +199,41 @@
 				A0FB475B2583F8A100807B06 /* Fact */,
 				A0FB47742588099E00807B06 /* SquareRoots */,
 				A0FB47822588FE8C00807B06 /* Scope */,
+				A03D0441258C8A4F002CB533 /* Translations */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin XCBuildConfiguration section */
+		A03D0443258C8A4F002CB533 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILT_PRODUCTS_DIR = "ns,";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 7D49J2XMDA;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A03D0444258C8A4F002CB533 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILT_PRODUCTS_DIR = "ns,";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 7D49J2XMDA;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		A0FB475C2583F8A100807B06 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -361,6 +433,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A03D0442258C8A4F002CB533 /* Build configuration list for PBXLegacyTarget "Translations" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A03D0443258C8A4F002CB533 /* Debug */,
+				A03D0444258C8A4F002CB533 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		A0FB475A2583F8A100807B06 /* Build configuration list for PBXProject "NGGExamples" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -1,0 +1,216 @@
+jmp one_sol_1args_guard
+one_sol_1args:
+push 1
+out
+pop
+push [rex+0]
+out
+pop
+ret
+one_sol_1args_guard:
+jmp two_sol_2args_guard
+two_sol_2args:
+push 2
+out
+pop
+push [rex+0]
+out
+pop
+push [rex+1]
+out
+pop
+ret
+two_sol_2args_guard:
+jmp no_sol_0args_guard
+no_sol_0args:
+push 0
+out
+pop
+ret
+no_sol_0args_guard:
+jmp inf_sol_0args_guard
+inf_sol_0args:
+push 1
+push -1
+mul
+push 1
+mul
+out
+pop
+ret
+inf_sol_0args_guard:
+jmp giveYouUp_0args_guard
+giveYouUp_0args:
+in
+pop [rex+0]
+in
+pop [rex+1]
+in
+pop [rex+2]
+push [rex+0]
+push 0
+eq
+push 0
+je lbl_29_6_cont__HBRCK
+push 3
+push rex
+add
+pop rex
+push [rex-2]
+push 0
+eq
+push 0
+je lbl_30_10_else__XHBQE
+push [rex-1]
+push 0
+eq
+push 0
+je lbl_31_14_else__VDGIH
+call inf_sol_0args
+push rax
+push rex
+push 3
+sub
+pop rex
+pop rax
+ret
+jmp lbl_31_14_cont__PBVFQ
+lbl_31_14_else__VDGIH:
+call no_sol_0args
+push rax
+push rex
+push 3
+sub
+pop rex
+pop rax
+ret
+lbl_31_14_cont__PBVFQ:
+jmp lbl_30_10_cont__AFMCD
+lbl_30_10_else__XHBQE:
+push 1
+push -1
+mul
+push [rex-1]
+mul
+push [rex-2]
+div
+pop [rex+0]
+call one_sol_1args
+push rax
+push rex
+push 3
+sub
+pop rex
+pop rax
+ret
+lbl_30_10_cont__AFMCD:
+push rex
+push 3
+sub
+pop rex
+lbl_29_6_cont__HBRCK:
+push [rex+1]
+push [rex+1]
+mul
+push 4
+push [rex+0]
+push [rex+2]
+mul
+mul
+sub
+pop [rex+3]
+push [rex+3]
+push 0
+gr
+push 0
+je lbl_41_6_else__JTNDV
+push 4
+push rex
+add
+pop rex
+push [rex-1]
+push 2
+pow
+pop [rex-1]
+push [rex-1]
+push [rex-3]
+sub
+push 2
+push [rex-4]
+mul
+div
+pop [rex+0]
+push 1
+push -1
+mul
+push [rex-1]
+mul
+push [rex-3]
+sub
+push 2
+push [rex-4]
+mul
+div
+pop [rex+1]
+call two_sol_2args
+push rax
+push rex
+push 4
+sub
+pop rex
+pop rax
+ret
+push rex
+push 4
+sub
+pop rex
+jmp lbl_41_6_cont__BCITC
+lbl_41_6_else__JTNDV:
+push 4
+push rex
+add
+pop rex
+push [rex-1]
+push 0
+eq
+push 0
+je lbl_45_10_else__RUTSN
+push 1
+push -1
+mul
+push [rex-3]
+mul
+push 2
+push [rex-4]
+mul
+div
+pop [rex+0]
+call one_sol_1args
+push rax
+push rex
+push 4
+sub
+pop rex
+pop rax
+ret
+jmp lbl_45_10_cont__HIBAF
+lbl_45_10_else__RUTSN:
+call no_sol_0args
+push rax
+push rex
+push 4
+sub
+pop rex
+pop rax
+ret
+lbl_45_10_cont__HIBAF:
+push rex
+push 4
+sub
+pop rex
+lbl_41_6_cont__BCITC:
+ret
+giveYouUp_0args_guard:
+mov rex 0
+call giveYouUp_0args
+hlt

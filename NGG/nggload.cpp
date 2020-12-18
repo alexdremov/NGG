@@ -2,44 +2,48 @@
 #include "ASTLoader/ASTDumper.h"
 #include "AST/ASTNode.h"
 #include "Compiler/NGGCompiler.h"
-#include "Helpers/ParamsParser.h"
+#include "ASTLoader/LoaderParamsParser.h"
 
-int main(const int argc, const char* argv[]) {
-    auto params = CLParams{};
+int main(const int argc, const char *argv[]) {
+    auto params = LoaderCLParams {};
     params.cTor();
     bool result = params.parseArgs(argc, argv);
 
-    if (!result){
+    if (!result) {
         printf("error: ngg: Error processing command line arguments\n");
         return EXIT_FAILURE;
     }
 
-    FILE* fileIn = fopen(params.inputFileName, "r");
-    if (!fileIn){
+    FILE *fileIn = fopen(params.inputFileName, "r");
+    if (!fileIn) {
         printf("error: ngg: Error opening input file\n");
         return EXIT_FAILURE;
     }
 
-    NGG::ASTNode* allNodes = nullptr;
-    auto* head = NGG::ASTLoader::load(fileIn, &allNodes);
+    NGG::ASTNode *allNodes = nullptr;
+    auto *head = NGG::ASTLoader::load(fileIn, &allNodes);
 
-    NGG::NGGCompiler compiler{};
+    if (head == nullptr) {
+        return EXIT_SUCCESS;
+    }
+
+    NGG::NGGCompiler compiler {};
     compiler.cTor(head);
-    compiler.dumpGraph();
+
+    if (params.graph)
+        compiler.dumpGraph();
 
     compiler.compile();
 
-    if (!compiler.isCompileSuccessful()){
+    if (!compiler.isCompileSuccessful()) {
         compiler.dumpCompileErrorStack(params.inputFileRealName);
         printf("error: ngg: Unsuccessful parse\n");
-        compiler.dTor();
+//        compiler.dTor();
         params.dTor();
         return EXIT_FAILURE;
     }
 
-    compiler.saveAsmSource("a.spus");
-
-    FILE* generated = fopen("generated.ngg", "w");
+    FILE *generated = fopen(params.outputFileName, "w");
     NGG::ASTDumper::dumpCode(generated, head);
 
     fclose(generated);

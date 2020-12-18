@@ -2,87 +2,54 @@
 ; giveYouUp_0args function definition (source:0:0)
 jmp giveYouUp_0args_guard
 giveYouUp_0args:
-in ; input 0:0 
+push 0
+pop [rex+0] ; identifier tmp
+; processing while:0:0
+lbl_0_0_begin__IAOLN:
+push [rex+0] ; identifier tmp
+push 5
+neq ; !=
+push 0
+je lbl_0_0_cont__HBRCK
+; incrementing rex for 1
+inc rex
+push [rex-1] ; identifier tmp
 pop [rex+0] ; preparing arg for func call
-call fact_1args
-push rax ; pushing return value
-out
-pop
+push [rex-1] ; identifier tmp
+pop [rex+1] ; preparing arg for func call
+push [rex-1] ; identifier tmp
+pop [rex+2] ; preparing arg for func call
+call not_main_3args
+push 1
+push [rex-1] ; identifier tmp
+add ; Lex_AdAssg 0:0
+pop [rex-1] ; identifier tmp
+; decrementing rex for 1
+dec rex
+jmp lbl_0_0_begin__IAOLN
+lbl_0_0_cont__HBRCK:
 ret
 giveYouUp_0args_guard:
 
 
-; fact_1args function definition (source:0:0)
-jmp fact_1args_guard
-fact_1args:
-push 0
-pop [rex+1] ; identifier x
-; processing if:0:0
-push [rex+0] ; identifier num
-push 1
-leq ; <=
-push 0
-je lbl_0_0_else__IAOLN
-; incrementing rex for 2
+; not_main_3args function definition (source:0:0)
+jmp not_main_3args_guard
+not_main_3args:
+push [rex+0] ; identifier a
+push [rex+1] ; identifier b
 push 2
-push rex
-add
-pop rex
-; inc complete
-
-push 1
-; decrementing rex for 2
-push rex
-push 2
-sub
-pop rex
-; dec complete
-
-pop rax ; return value
+pow ; 0:0
+push [rex+2] ; identifier c
+push 3
+pow ; 0:0
+add ; 0:0
+add ; 0:0
+pop [rex+3] ; identifier d
+push [rex+3] ; identifier d
+out
+pop
 ret
-; decrementing rex for 2
-push rex
-push 2
-sub
-pop rex
-; dec complete
-
-jmp lbl_0_0_cont__HBRCK
-lbl_0_0_else__IAOLN:
-; incrementing rex for 2
-push 2
-push rex
-add
-pop rex
-; inc complete
-
-push [rex-2] ; identifier num
-push 1
-sub ; 0:0
-pop [rex+0] ; preparing arg for func call
-call fact_1args
-push rax ; pushing return value
-push [rex-2] ; identifier num
-mul ; 0:0
-; decrementing rex for 2
-push rex
-push 2
-sub
-pop rex
-; dec complete
-
-pop rax ; return value
-ret
-; decrementing rex for 2
-push rex
-push 2
-sub
-pop rex
-; dec complete
-
-lbl_0_0_cont__HBRCK:
-ret
-fact_1args_guard:
+not_main_3args_guard:
 
 mov rex 0
 call giveYouUp_0args

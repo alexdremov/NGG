@@ -19,9 +19,19 @@
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
+		<key>Translations.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>A03D0441258C8A4F002CB533</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>A0FB475B2583F8A100807B06</key>
 		<dict>
 			<key>primary</key>

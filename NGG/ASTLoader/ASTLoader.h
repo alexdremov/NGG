@@ -60,7 +60,9 @@ namespace NGG {
 
             switch (head->getKind()) {
                 case Kind_FuncDecl:
-                    fprintf(fOut, "FuncDecl \"%s\"", head->getLexeme().getString()->begin());
+                    fprintf(fOut, "FuncDecl \"%s\"",
+                            strcmp(head->getLexeme().getString()->begin(), "giveYouUp") == 0 ? "main"
+                                                                                             : head->getLexeme().getString()->begin());
                     break;
                 case Kind_Input:
                     fprintf(fOut, "Input @");
@@ -75,14 +77,39 @@ namespace NGG {
                     fprintf(fOut, "Link @");
                     break;
                 case Kind_FuncCall:
-                    fprintf(fOut, "FuncCall \"%s\"", head->getLexeme().getString()->begin());
+                    fprintf(fOut, "FuncCall \"%s\"",
+                            strcmp(head->getLexeme().getString()->begin(), "giveYouUp") == 0 ? "main"
+                                                                                             : head->getLexeme().getString()->begin());
                     break;
                 case Kind_ReturnStmt:
                     fprintf(fOut, "ReturnStmt @");
                     break;
-                case Kind_AssignExpr: // TODO: str value
-                    fprintf(fOut, "AssignExpr \"%s\"", head->getLexeme().getString()->begin());
+                case Kind_AssignExpr:
+                {
+                    const char* op = "=";
+                    switch (head->getLexeme().getType()) {
+                        case Lex_AdAssg:
+                            op = "+=";
+                            break;
+                        case Lex_Assg:
+                            op = "=";
+                            break;
+                        case Lex_MiAssg:
+                            op = "-=";
+                            break;
+                        case Lex_MuAssg:
+                            op = "*=";
+                            break;
+                        case Lex_DiAssg:
+                            op = "/=";
+                            break;
+                        default:{
+                            printf("error: unknown assign operator");
+                        }
+                    }
+                    fprintf(fOut, "AssignExpr \"%s\"", op);
                     break;
+                }
                 case Kind_VarDef:
                     fprintf(fOut, "VarDef \"%s\"", head->getLexeme().getString()->begin());
                     break;
@@ -174,6 +201,10 @@ namespace NGG {
                 } else if (strcmp(nodeType, "FuncDecl") == 0) {
                     kind = Kind_FuncDecl;
                     auto *strValue = GET_STRING;
+                    if (strcmp(strValue->begin(), "main") == 0) {
+                        strValue->dTor();
+                        strValue->cTor("giveYouUp");
+                    }
                     value.cTor(Lex_FDecl, strValue);
                 } else if (strcmp(nodeType, "Input") == 0) {
                     kind = Kind_Input;
@@ -189,6 +220,10 @@ namespace NGG {
                 } else if (strcmp(nodeType, "FuncCall") == 0) {
                     kind = Kind_FuncCall;
                     auto *strValue = GET_STRING;
+                    if (strcmp(strValue->begin(), "main") == 0) {
+                        strValue->dTor();
+                        strValue->cTor("giveYouUp");
+                    }
                     value.cTor(Lex_None, strValue);
                 } else if (strcmp(nodeType, "ReturnStmt") == 0) {
                     kind = Kind_ReturnStmt;
@@ -223,6 +258,12 @@ namespace NGG {
                     if (strcmp(strValue->begin(), "==") == 0) {
                         kind = Kind_CmpOperator;
                         type = Lex_Eq;
+                    }if (strcmp(strValue->begin(), "<") == 0) {
+                        kind = Kind_CmpOperator;
+                        type = Lex_Le;
+                    }if (strcmp(strValue->begin(), ">") == 0) {
+                        kind = Kind_CmpOperator;
+                        type = Lex_Gr;
                     } else if (strcmp(strValue->begin(), "<=") == 0) {
                         kind = Kind_CmpOperator;
                         type = Lex_Leq;
@@ -256,18 +297,19 @@ namespace NGG {
                 } else {
                     printf("Undefined node!\n");
                 }
-                nodesArr[i].cTor(kind, value,  l == 0 ? nullptr : nodesArr + l, r == 0 ? nullptr :nodesArr + r);
+                nodesArr[i].cTor(kind, value, l == 0 ? nullptr : nodesArr + l, r == 0 ? nullptr : nodesArr + r);
             }
             nodesArr[0].setRight(nullptr);
             nodesArr[0].setLeft(nullptr);
 
             for (size_t i = 0; i < numNodes; i++) {
-                if (nodesArr[i].getKind() == Kind_FuncDecl){
+                if (nodesArr[i].getKind() == Kind_FuncDecl) {
                     nodesArr[i].getRight()->setLinkKind(Kind_Link_NewScope);
-                }else if (nodesArr[i].getKind() == Kind_IfStmt){
-                    nodesArr[i].getRight()->getRight()->setLinkKind(Kind_Link_NewScope);
+                } else if (nodesArr[i].getKind() == Kind_IfStmt) {
+                    if (nodesArr[i].getRight()->getRight() != nullptr)
+                            nodesArr[i].getRight()->getRight()->setLinkKind(Kind_Link_NewScope);
                     nodesArr[i].getRight()->getLeft()->setLinkKind(Kind_Link_NewScope);
-                }else if (nodesArr[i].getKind() == Kind_WhileStmt){
+                } else if (nodesArr[i].getKind() == Kind_WhileStmt) {
                     nodesArr[i].getRight()->setLinkKind(Kind_Link_NewScope);
                 }
             }

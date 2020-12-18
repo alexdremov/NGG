@@ -209,7 +209,7 @@ namespace NGG {
             env.addNewLevel(true);
             if (head->getLeft() != nullptr && head->getLeft()->getKind() != Kind_None) {
                 ASTNode *cur = head->getLeft();
-                while (cur != nullptr && cur->getKind() != Kind_None) {
+                while (cur != nullptr && cur->getKind() != Kind_None && cur->getLeft() != nullptr) {
                     Lexeme name = cur->getLeft()->getLexeme();
                     env.def(name.getString());
                     cur = cur->getRight();
@@ -295,8 +295,8 @@ namespace NGG {
         void c_AssignExpr(ASTNode *head) {
             auto type = head->getLexeme().getType();
 
-            ASTNode *idNode = head->getRight();
-            ASTNode *valNode = head->getLeft();
+            ASTNode *idNode = head->getLeft();
+            ASTNode *valNode = head->getRight();
 
             StrContainer *name = idNode->getLexeme().getString();
             Optional<IdCompiler> found = env.get(name);
@@ -340,6 +340,7 @@ namespace NGG {
                     break;
                 case Lex_Assg: {
                     processFurther(head->getRight(), true);
+                    break;
                 }
                 default: {
                     CompileError err {};
@@ -349,7 +350,9 @@ namespace NGG {
                     return;
                 }
             }
-            varSpecificOperation("pop", found.unwrap(), 0, head->getLexeme().getLine(), head->getLexeme().getCol());
+            if (valNode != nullptr && valNode->getKind() != Kind_None)
+                varSpecificOperation("pop", found.unwrap(), 0,
+                                     head->getLexeme().getLine(), head->getLexeme().getCol());
         }
 
         void c_VarDef(ASTNode *head) {
@@ -362,6 +365,11 @@ namespace NGG {
                 cErrors->push(err);
                 return;
             }
+
+            if (head->getLeft() == nullptr || (head->getLeft() != nullptr && head->getLeft()->getKind() == Kind_None)){
+                return;
+            }
+
             processFurther(head->getLeft(), true);
             Optional<IdCompiler> found = env.get(type.getString());
 
@@ -478,7 +486,7 @@ namespace NGG {
                                        head->getLexeme().getCol());
             processFurther(head->getLeft(), true);
 
-            if (elseBranch->getKind() != Kind_None) {
+            if (elseBranch != nullptr && elseBranch->getKind() != Kind_None) {
                 compiledString->sEndPrintf("push 0\n"
                                            "je %s\n", elseLabel.begin());
             } else {
@@ -486,7 +494,7 @@ namespace NGG {
                                            "je %s\n", continueLabel.begin());
             }
             processFurther(ifBranch);
-            if (elseBranch->getKind() != Kind_None) {
+            if (elseBranch != nullptr && elseBranch->getKind() != Kind_None) {
                 compiledString->sEndPrintf("jmp %s\n", continueLabel.begin());
                 compiledString->sEndPrintf("%s:\n", elseLabel.begin());
                 processFurther(elseBranch);
